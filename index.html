@@ -298,15 +298,19 @@ footer{margin-top:26px; font-size:11.5px; color:var(--steel); line-height:1.6; b
         </div>
         <div class="row2">
           <div class="field">
-            <label>Profundidad de zapata <span class="unit">(m)</span></label>
+            <label>Profundidad hasta la base <span class="unit">(m)</span></label>
             <input type="number" id="profZapata" step="0.05" min="0.3" value="0.7">
           </div>
           <div class="field">
-            <label>Densidad del suelo <span class="unit">(kg/m³)</span></label>
-            <input type="number" id="densSuelo" step="50" min="1200" value="1700">
+            <label>Espesor de zapata <span class="unit">(m)</span></label>
+            <input type="number" id="espesorZapata" step="0.05" min="0.15" value="0.35">
           </div>
         </div>
-        <div class="hint">Peso resistente al arrancamiento = peso propio de la zapata + peso del cono de tierra que la cubre (ángulo de reparto 30° desde el borde de la zapata hasta la superficie). No incluye fricción lateral del fuste ni napa freática — verificar con calicata real.</div>
+        <div class="field">
+          <label>Densidad del suelo <span class="unit">(kg/m³)</span></label>
+          <input type="number" id="densSuelo" step="50" min="1200" value="1700">
+        </div>
+        <div class="hint">Peso resistente orientativo = peso propio de la zapata + suelo sobre su cara superior, con cono de reparto de 30°. La cobertura de suelo se obtiene como profundidad a base menos espesor de zapata. No incluye fricción lateral, napa ni interacción entre zapatas: verificar con calicata y cálculo geotécnico.</div>
       </div>
 
       <div class="card">
@@ -352,7 +356,11 @@ footer{margin-top:26px; font-size:11.5px; color:var(--steel); line-height:1.6; b
           <div class="field">
             <label>Longitud del sector con altillo <span class="unit">(m)</span></label>
             <input type="number" id="largoAltillo" step="0.1" min="0" value="5.5">
-            <div class="hint">Tramo del largo total (dormitorio + baño) sobre el que se apoya el piso del altillo. Se asume que el cielorraso de ese sector coincide con la altura de pared.</div>
+          </div>
+          <div class="field">
+            <label>Ancho estructural del altillo <span class="unit">(m)</span></label>
+            <input type="number" id="anchoAltillo" step="0.1" min="0.5" value="3.0">
+            <div class="hint">Ancho real que cruzan las vigas. No puede superar el ancho del galpón ni el ancho con altura útil que quieras aprovechar.</div>
           </div>
         </div>
       </div>
@@ -543,15 +551,15 @@ footer{margin-top:26px; font-size:11.5px; color:var(--steel); line-height:1.6; b
         <div class="table-wrap">
           <table id="tablaCostos"></table>
         </div>
-        <p class="note">Estimación en pesos uruguayos a partir de los precios de referencia editables. No incluye mano de obra, flete, IVA (si no está ya incluido en el precio cargado), ni desperdicio de material — sumalos aparte para una estimación de presupuesto real.</p>
+        <p class="note">Estimación en pesos uruguayos a partir de los precios de referencia editables. No incluye mano de obra, flete, IVA (si no está ya incluido en el precio cargado), fijaciones ni remates. Los paneles se cobran por placas enteras; verificar cortes y desperdicio con el proveedor antes de comprar.</p>
       </div>
 
       <div class="card">
-        <h2>Columnas y viga/dintel (por pórtico)</h2>
+        <h2>Columnas y viga/dintel — referencia de cómputo</h2>
         <div class="table-wrap">
           <table id="tablaPorticos"></table>
         </div>
-        <p class="note">Preselección orientativa por rango de carga y luz, pensada para pórticos livianos de vivienda/galpón de una planta. <b>No reemplaza la verificación de pandeo (columnas) ni de flexión y flecha (viga/dintel)</b> que debe hacer el ingeniero estructural, incluyendo el efecto del viento actuando como carga lateral sobre el pórtico rígido.</p>
+        <p class="note"><b>No es una selección estructural.</b> Los perfiles se muestran solo para obtener un peso preliminar de materiales. Definir columnas, vigas y uniones requiere verificar pandeo, flexión, flecha, momento de pórtico y viento con un ingeniero.</p>
       </div>
 
       <div class="card">
@@ -564,21 +572,21 @@ footer{margin-top:26px; font-size:11.5px; color:var(--steel); line-height:1.6; b
       </div>
 
       <div class="card">
-        <h2>Placa base — verificación de flexión</h2>
+        <h2>Placa base — estimación de ménsula</h2>
         <div class="table-wrap">
           <table id="tablaPlaca"></table>
         </div>
         <div class="warn-box" id="warnPlaca"></div>
-        <p class="note">Modelo simplificado de ménsula: la placa flexiona entre la cara de la columna y la línea de bulones bajo la fuerza de tracción del bulón más solicitado. No considera rigidizadores (cartelas) ni la interacción entre bulones — si el espesor requerido resulta muy grande, suele ser más práctico sumar cartelas que engrosar la chapa.</p>
+        <p class="note">Estimación de una ménsula aislada: no constituye una verificación de placa base. Faltan momento de pórtico, distribución real de bulones, soldaduras, rigidizadores, apoyo sobre grout y rotura del hormigón.</p>
       </div>
 
       <div class="card">
-        <h2>Zapata — verificación a arrancamiento (uplift)</h2>
+        <h2>Zapata — indicador preliminar de arrancamiento</h2>
         <div class="table-wrap">
           <table id="tablaZapataUplift"></table>
         </div>
         <div class="warn-box" id="warnZapataUplift"></div>
-        <p class="note">Factor de seguridad mínimo recomendado frente a arrancamiento: 1,5 (criterio habitual para este tipo de verificación). Este cálculo es independiente del dimensionado de la zapata por capacidad portante del suelo (que responde a la carga vertical, no a la succión) — ambos deben verificarse.</p>
+        <p class="note">Indicador preliminar con factor de seguridad de referencia 1,5. No verifica capacidad portante, deslizamiento, vuelco, corte/punzonado ni efecto de napa; todos deben verificarse en el proyecto de fundaciones.</p>
       </div>
 
       <div class="card">
@@ -705,11 +713,11 @@ const $width = el('ancho'), $wallHeight = el('alturaPared'), $depth = el('profun
 const $slope = el('pendiente'), $angle = el('angulo'), $ridgeHeight = el('alturaCumbrera'), $rafterLength = el('largoCabreada');
 const $profileType = el('tipoPerfil'), $profileSize = el('medidaPerfil'), $coastal = el('costero'), $purlinSupportType = el('tipoApoyoCorrea');
 const $warnHeight = el('warnAltura'), $warnAngle = el('warnAngulo');
-const $frameSpacing = el('sepPorticos'), $atticLength = el('largoAltillo'), $atticUse = el('usoAltillo');
+const $frameSpacing = el('sepPorticos'), $atticLength = el('largoAltillo'), $atticWidth = el('anchoAltillo'), $atticUse = el('usoAltillo');
 const $hasAttic = el('hayAltillo');
 const $boltCount = el('nBulones'), $boltDiameter = el('diamBulon');
 const $plateThickness = el('espesorPlaca'), $plateOverhang = el('voladizoPlaca'), $plateTribWidth = el('anchoTribPlaca');
-const $footingWidth = el('anchoZapata'), $footingLength = el('largoZapata'), $footingDepth = el('profZapata'), $soilDensity = el('densSuelo');
+const $footingWidth = el('anchoZapata'), $footingLength = el('largoZapata'), $footingDepth = el('profZapata'), $footingThickness = el('espesorZapata'), $soilDensity = el('densSuelo');
 const $bracedGables = el('testerosArriostrados'), $diagonalDiameter = el('diamDiagonal');
 const $floorProfile = el('perfilPiso'), $floorBeamSpacing = el('sepVigasPiso'), $midSupport = el('apoyoIntermedio'), $floorType = el('tipoPiso');
 const $sheetWidth = el('anchoChapa'), $slabThickness = el('espesorPlatea'), $panelWidth = el('panelAncho'), $panelHeight = el('panelAlto'), $openings = el('aberturas');
@@ -741,6 +749,38 @@ function loadState(){
 }
 
 function clamp(v,min,max){return Math.max(min, Math.min(max, v));}
+
+function calculateWallAreas({width, wallH, ridgeH, depth, openings}){
+  const perimeter = 2*(width+depth);
+  const rectangularArea = perimeter*wallH;
+  const gableArea = width*Math.max(0, ridgeH-wallH); // two triangular testeros
+  const grossArea = rectangularArea+gableArea;
+  const netArea = Math.max(0, grossArea-openings);
+  return {perimeter, rectangularArea, gableArea, grossArea, netArea};
+}
+
+function calculateFootingUplift({width, length, baseDepth, thickness, soilDensity, tension}){
+  const footingThickness = Math.min(Math.max(0, thickness), Math.max(0, baseDepth));
+  const soilCover = Math.max(0, baseDepth-footingThickness);
+  const footingWeight = width*length*footingThickness*CONCRETE_DENSITY;
+  const tan30 = Math.tan(30*Math.PI/180);
+  const topWidth = width + 2*soilCover*tan30;
+  const topLength = length + 2*soilCover*tan30;
+  const A1 = width*length, A2 = topWidth*topLength;
+  const soilVolume = soilCover/3*(A1+A2+Math.sqrt(A1*A2));
+  const soilWeight = soilVolume*soilDensity;
+  const resistingWeight = footingWeight+soilWeight;
+  const FS = tension>0 ? resistingWeight/tension : Infinity;
+  return {footingThickness, soilCover, footingWeight, soilVolume, soilWeight, resistingWeight, FS};
+}
+
+function calculateRoofPanelCount({depth, slopeLength, panelWidth, panelHeight}){
+  const panelsPerSlope = Math.min(
+    Math.ceil(depth/panelWidth)*Math.ceil(slopeLength/panelHeight),
+    Math.ceil(depth/panelHeight)*Math.ceil(slopeLength/panelWidth)
+  );
+  return panelsPerSlope*2;
+}
 
 function populateSizes(){
   const cat = CATALOGS[$profileType.value];
@@ -823,8 +863,9 @@ function renderFloor(){
   const profile = FLOOR_BEAMS.find(p=>p.id===$floorProfile.value) || FLOOR_BEAMS[0];
   const spacing = parseFloat($floorBeamSpacing.value) || 0.5;
   const withMidSupport = $midSupport.value === 'si';
-  const frameSpacing = parseFloat($frameSpacing.value) || 3.2;
-  const effectiveSpan = withMidSupport ? frameSpacing/2 : frameSpacing;
+  const buildingWidth = parseFloat($width.value) || 0;
+  const atticWidth = Math.min(parseFloat($atticWidth.value) || 0, buildingWidth);
+  const effectiveSpan = withMidSupport ? atticWidth/2 : atticWidth;
   // allowable span adjustment based on actual beam spacing (reference calibrated at 0.5 m)
   const allowableSpan = profile.spanRef05 * Math.sqrt(0.5/spacing);
   const ok = allowableSpan >= effectiveSpan;
@@ -834,15 +875,16 @@ function renderFloor(){
     <tr><td>Perfil elegido</td><td class="num">${profile.label}</td></tr>
     <tr><td>Peso del perfil</td><td class="num">${profile.pesoKgM.toFixed(2)} kg/m</td></tr>
     <tr><td>Separación entre vigas</td><td class="num">${spacing.toFixed(2)} m</td></tr>
-    <tr><td>Luz a cubrir (según pórticos${withMidSupport?' y apoyo intermedio':''})</td><td class="num">${effectiveSpan.toFixed(2)} m</td></tr>
+    <tr><td>Ancho estructural de altillo</td><td class="num">${atticWidth.toFixed(2)} m</td></tr>
+    <tr><td>Luz a cubrir${withMidSupport?' (con apoyo intermedio)':''}</td><td class="num">${effectiveSpan.toFixed(2)} m</td></tr>
     <tr><td>Luz máxima admisible orientativa</td><td class="num">${allowableSpan.toFixed(2)} m</td></tr>
-    <tr><td>Resultado</td><td class="num" style="color:${ok?'var(--ok)':'var(--warn)'}">${ok?'✔ suficiente (orientativo)':'⚠ insuficiente (orientativo)'}</td></tr>
+    <tr><td>Lectura</td><td class="num" style="color:${ok?'var(--ok)':'var(--warn)'}">${ok?'dentro de la regla práctica':'supera la regla práctica'}</td></tr>
   `;
   const warnBox = document.getElementById('warnPiso');
   if(!ok){
     warnBox.classList.add('show');
     if(!withMidSupport){
-      warnBox.innerHTML = `Con este perfil y separación, la luz a cubrir (${effectiveSpan.toFixed(2)} m) supera la luz máxima orientativa (${allowableSpan.toFixed(2)} m). La opción más económica sería sumar un apoyo intermedio (tabique del corredor) — si ese tabique ya está en el plano, el costo adicional es prácticamente nulo.`;
+      warnBox.innerHTML = `Con este perfil y separación, la luz a cubrir (${effectiveSpan.toFixed(2)} m) supera la luz máxima orientativa (${allowableSpan.toFixed(2)} m). La opción más económica sería sumar un apoyo intermedio si ese tabique realmente puede tomar la carga. Confirmar siempre por flexión y flecha.`;
     } else {
       warnBox.innerHTML = `Con este perfil y separación, la luz a cubrir (${effectiveSpan.toFixed(2)} m) — ya considerando el apoyo intermedio — sigue superando la luz máxima orientativa (${allowableSpan.toFixed(2)} m). Opciones: acercar más las vigas (más piezas del mismo perfil) o subir a un perfil mayor / mayor espesor (menos piezas, pero más caras por metro) — convienen comparar ambas en la tarjeta de costos antes de decidir.`;
     }
@@ -867,10 +909,10 @@ function renderAtticFloorMaterials({width, wallH, ridgeH, rafterLen, deg}){
   const profile = FLOOR_BEAMS.find(p=>p.id===$floorProfile.value) || FLOOR_BEAMS[0];
   const beamSpacing = parseFloat($floorBeamSpacing.value) || 0.5;
   const withMidSupport = $midSupport.value === 'si';
-  const frameSpacing = parseFloat($frameSpacing.value) || 3.2;
+  const atticWidth = Math.min(parseFloat($atticWidth.value) || 0, width);
 
   const beamCount = Math.ceil(atticLength/beamSpacing)+1;
-  const totalBeamLength = beamCount*frameSpacing;
+  const totalBeamLength = beamCount*atticWidth;
   const beamWeight = totalBeamLength*profile.pesoKgM;
 
   const headerLength = withMidSupport ? atticLength : 0;
@@ -880,6 +922,7 @@ function renderAtticFloorMaterials({width, wallH, ridgeH, rafterLen, deg}){
   document.getElementById('tablaMatPisoAltillo').innerHTML = `
     <tr><th>Ítem</th><th>Estimación</th></tr>
     <tr><td>Perfil de vigas de piso</td><td class="num">${profile.label}</td></tr>
+    <tr><td>Disposición modelada</td><td class="num">vigas cruzando ${atticWidth.toFixed(2)} m, cada ${beamSpacing.toFixed(2)} m</td></tr>
     <tr><td>Apoyo intermedio</td><td class="num">${withMidSupport ? 'Sí (tabique de corredor)' : 'No'}</td></tr>
     <tr><td>Cantidad de vigas</td><td class="num">${beamCount}</td></tr>
     <tr><td>Vigas — metros lineales / peso</td><td class="num">${totalBeamLength.toFixed(1)} m / ${beamWeight.toFixed(0)} kg</td></tr>
@@ -916,9 +959,9 @@ function renderFrames({width, wallH, ridgeH, rafterLen, deg}){
     <tr><td>Área tributaria por pórtico (ambas aguas)</td><td class="num">${tributaryArea.toFixed(1)} m²</td></tr>
     <tr><td>Carga total estimada por pórtico</td><td class="num">${totalFrameLoad.toFixed(0)} kg</td></tr>
     <tr><td>Carga axial estimada por columna</td><td class="num">${loadPerColumn.toFixed(0)} kg</td></tr>
-    <tr><td>Columna sugerida</td><td class="num">${col.label}</td></tr>
+    <tr><td>Perfil usado para peso preliminar de columnas</td><td class="num">${col.label}</td></tr>
     <tr><td>Semiluz (viga/dintel)</td><td class="num">${halfSpan.toFixed(2)} m</td></tr>
-    <tr><td>Viga/dintel sugerido</td><td class="num">${viga.label}</td></tr>
+    <tr><td>Perfil usado para peso preliminar de vigas</td><td class="num">${viga.label}</td></tr>
     <tr><td>Correa — separación máx. admisible (${isContinuous?'continua a dos tramos':'tramo simple'})</td><td class="num">${effectiveMaxSpacing.toFixed(2)} m</td></tr>
     ${spacingWarning}
   `;
@@ -993,9 +1036,9 @@ function renderWind({width, wallH, ridgeH, rafterLen, deg}){
     <tr><td>Corte en la base por columna (empuje lateral del viento)</td><td class="num">${columnShear.toFixed(0)} kg</td></tr>
     <tr><td colspan="2" style="border-top:1px dashed var(--paper-edge);"></td></tr>
     <tr><td>Anclaje elegido</td><td class="num">${boltCount} × Ø${diameter} mm</td></tr>
-    <tr><td>Capacidad admisible a tracción del anclaje</td><td class="num">${totalCap.toFixed(0)} kg (${(tensionRatio*100).toFixed(0)}% usado)</td></tr>
-    <tr><td>Capacidad admisible a corte del anclaje (≈0.6× tracción)</td><td class="num">${totalShearCap.toFixed(0)} kg (${(shearRatio*100).toFixed(0)}% usado)</td></tr>
-    <tr style="font-weight:700;"><td>Interacción tracción + corte (T/Tadm + V/Vadm)</td><td class="num" style="color:${interactionOk?'var(--ok)':'var(--warn)'}">${interaction.toFixed(2)} ${interactionOk?'≤ 1 ✔':'> 1 ⚠'}</td></tr>
+    <tr><td>Resistencia de referencia a tracción del acero</td><td class="num">${totalCap.toFixed(0)} kg (${(tensionRatio*100).toFixed(0)}% usado)</td></tr>
+    <tr><td>Resistencia de referencia a corte del acero (≈0.6× tracción)</td><td class="num">${totalShearCap.toFixed(0)} kg (${(shearRatio*100).toFixed(0)}% usado)</td></tr>
+    <tr style="font-weight:700;"><td>Índice aproximado T/Tref + V/Vref</td><td class="num" style="color:${interactionOk?'var(--ok)':'var(--warn)'}">${interaction.toFixed(2)} ${interactionOk?'≤ 1':' > 1'}</td></tr>
   `;
 
   const warnBox = document.getElementById('warnViento');
@@ -1010,9 +1053,13 @@ function renderWind({width, wallH, ridgeH, rafterLen, deg}){
     warnBox.style.borderLeftColor = 'var(--ok)';
     warnBox.style.background = '#EAF3EC';
     warnBox.style.color = 'var(--ok)';
-    warnBox.innerHTML = `El peso propio de la cubierta supera a la succión estimada incluso en zona local: no habría levantamiento neto por succión (orientativo). El anclaje elegido también cubre el corte transversal estimado. Aun así, conviene prever un anclaje real — no solo apoyo — para dar continuidad estructural durante el montaje.`;
+    warnBox.innerHTML = `El peso propio de la cubierta supera a la succión estimada incluso en zona local. Esto no elimina la necesidad de anclaje: faltan presión interna, momento de pórtico y resistencia del anclaje en hormigón.`;
   } else {
-    warnBox.classList.remove('show');
+    warnBox.classList.add('show');
+    warnBox.style.borderLeftColor = 'var(--steel)';
+    warnBox.style.background = '#F2F0EA';
+    warnBox.style.color = 'var(--ink-soft)';
+    warnBox.innerHTML = `El índice aproximado queda por debajo de 1, pero no es una aprobación del anclaje. Confirmar Cpe por zonas, presión interna, momento de pórtico, bulones, soldaduras y rotura del hormigón con el ingeniero.`;
   }
 
   return {qc, localTension, columnShear, boltCount, diameter, boltCap, totalCap, columnTributaryArea};
@@ -1039,7 +1086,7 @@ function renderBasePlate(wind){
     <tr><td>Fluencia de placa asumida (calidad comercial)</td><td class="num">${Fy} kg/cm²</td></tr>
     <tr style="font-weight:700;"><td>Espesor mínimo requerido (modelo de ménsula)</td><td class="num">${requiredThickness.toFixed(1)} mm</td></tr>
     <tr><td>Espesor de placa elegido</td><td class="num">${chosenThickness.toFixed(2)} mm</td></tr>
-    <tr><td>Resultado</td><td class="num" style="color:${ok?'var(--ok)':'var(--warn)'}">${ok?'✔ espesor suficiente (orientativo)':'⚠ espesor insuficiente (orientativo)'}</td></tr>
+    <tr><td>Comparación con este modelo aislado</td><td class="num" style="color:${ok?'var(--ok)':'var(--warn)'}">${ok?'espesor ≥ estimación':'espesor < estimación'}</td></tr>
   `;
 
   const warnBox = document.getElementById('warnPlaca');
@@ -1047,23 +1094,21 @@ function renderBasePlate(wind){
     warnBox.classList.add('show');
     warnBox.innerHTML = `El espesor elegido (${chosenThickness.toFixed(2)} mm) no alcanza el mínimo orientativo (${requiredThickness.toFixed(1)} mm) para la tracción por bulón estimada. Opciones, de menor a mayor costo: achicar el voladizo — acercar los bulones a la columna (sin costo, solo geometría), sumar bulones o agregar cartelas rigidizadoras (costo bajo), o subir el espesor de la placa (costo bajo, pero encarece toda la chapa de la placa).`;
   } else {
-    warnBox.classList.remove('show');
+    warnBox.classList.add('show');
+    warnBox.style.borderLeftColor = 'var(--steel)';
+    warnBox.style.background = '#F2F0EA';
+    warnBox.style.color = 'var(--ink-soft)';
+    warnBox.innerHTML = `El espesor supera la estimación de una ménsula aislada, pero falta verificar la placa base completa, sus soldaduras, el grout y el hormigón.`;
   }
 }
 
-function minSquareFootingSide(localTension, footingD, soilDensity){
+function minSquareFootingSide(localTension, footingBaseDepth, footingThickness, soilDensity){
   if(localTension<=0) return 0;
-  const tan30 = Math.tan(30*Math.PI/180);
   function FSforX(x){
-    const footingWeight = x*x*footingD*CONCRETE_DENSITY;
-    const top = x+2*footingD*tan30;
-    const A1=x*x, A2=top*top;
-    const coneVolume = footingD/3*(A1+A2+Math.sqrt(A1*A2));
-    const soilWeight = Math.max(0, coneVolume-x*x*footingD)*soilDensity;
-    return (footingWeight+soilWeight)/localTension;
+    return calculateFootingUplift({width:x, length:x, baseDepth:footingBaseDepth, thickness:footingThickness, soilDensity, tension:localTension}).FS;
   }
   let lo=0.2, hi=3.0;
-  if(FSforX(hi) < FS_MIN_UPLIFT) return hi; // not even 3m is enough — signal that another strategy is needed (tie into the slab, etc.)
+  if(FSforX(hi) < FS_MIN_UPLIFT) return null; // a larger or tied foundation needs design
   for(let i=0;i<40;i++){
     const mid=(lo+hi)/2;
     if(FSforX(mid) >= FS_MIN_UPLIFT) hi=mid; else lo=mid;
@@ -1075,34 +1120,26 @@ function renderFootingUplift(wind){
   const { localTension } = wind;
   const footingW = parseFloat($footingWidth.value)||0.6;
   const footingLen = parseFloat($footingLength.value)||0.6;
-  const footingD = parseFloat($footingDepth.value)||0.6;
+  const footingBaseDepth = parseFloat($footingDepth.value)||0.6;
+  const footingThicknessInput = parseFloat($footingThickness.value)||0.35;
   const soilDensity = parseFloat($soilDensity.value)||1700;
-
-  const footingWeight = footingW*footingLen*footingD*CONCRETE_DENSITY;
-
-  const tan30 = Math.tan(30*Math.PI/180);
-  const topWidth = footingW + 2*footingD*tan30;
-  const topLength = footingLen + 2*footingD*tan30;
-  const A1 = footingW*footingLen, A2 = topWidth*topLength;
-  const coneVolume = footingD/3*(A1+A2+Math.sqrt(A1*A2));
-  const soilWeight = Math.max(0, coneVolume-footingW*footingLen*footingD)*soilDensity; // subtract the volume already counted as footing concrete
-
-  const resistingWeight = footingWeight+soilWeight;
-  const FS = localTension>0 ? resistingWeight/localTension : Infinity;
+  const uplift = calculateFootingUplift({width:footingW, length:footingLen, baseDepth:footingBaseDepth, thickness:footingThicknessInput, soilDensity, tension:localTension});
+  const {footingThickness, soilCover, footingWeight, soilWeight, resistingWeight, FS} = uplift;
   const ok = localTension<=0 || FS>=FS_MIN_UPLIFT;
-  const suggestedSide = minSquareFootingSide(localTension, footingD, soilDensity);
+  const suggestedSide = minSquareFootingSide(localTension, footingBaseDepth, footingThickness, soilDensity);
 
   document.getElementById('tablaZapataUplift').innerHTML = `
     <tr><th>Dato</th><th>Valor</th></tr>
-    <tr><td>Dimensiones de zapata</td><td class="num">${footingW.toFixed(2)} × ${footingLen.toFixed(2)} × ${footingD.toFixed(2)} m</td></tr>
+    <tr><td>Dimensiones de zapata</td><td class="num">${footingW.toFixed(2)} × ${footingLen.toFixed(2)} × ${footingThickness.toFixed(2)} m</td></tr>
+    <tr><td>Profundidad a base / cobertura de suelo</td><td class="num">${footingBaseDepth.toFixed(2)} m / ${soilCover.toFixed(2)} m</td></tr>
     <tr><td>Peso propio de la zapata (hormigón)</td><td class="num">${footingWeight.toFixed(0)} kg</td></tr>
     <tr><td>Peso del cono de tierra sobre la zapata (30° de reparto)</td><td class="num">${soilWeight.toFixed(0)} kg</td></tr>
     <tr style="font-weight:700;"><td>Peso resistente total al arrancamiento</td><td class="num">${resistingWeight.toFixed(0)} kg</td></tr>
     <tr><td>Tracción neta a resistir (columna extrema, zona local)</td><td class="num">${localTension.toFixed(0)} kg</td></tr>
     <tr style="font-weight:700;"><td>Factor de seguridad frente a arrancamiento</td><td class="num" style="color:${ok?'var(--ok)':'var(--warn)'}">${FS===Infinity?'— (sin succión neta)':FS.toFixed(2)}</td></tr>
     <tr><td>Mínimo recomendado</td><td class="num">${FS_MIN_UPLIFT.toFixed(1)}</td></tr>
-    <tr><td>Lado mínimo sugerido (zapata cuadrada, a esta profundidad de ${footingD.toFixed(2)} m)</td><td class="num">${suggestedSide>0 ? suggestedSide.toFixed(2)+' × '+suggestedSide.toFixed(2)+' m' : '—'}</td></tr>
-    <tr><td>Resultado</td><td class="num" style="color:${ok?'var(--ok)':'var(--warn)'}">${ok?'✔ zapata suficiente frente a arrancamiento (orientativo)':'⚠ zapata insuficiente frente a arrancamiento (orientativo)'}</td></tr>
+    <tr><td>Lado mínimo indicativo (zapata cuadrada, con esta cobertura)</td><td class="num">${suggestedSide === null ? '&gt; 3,00 m — requiere otra solución' : suggestedSide>0 ? suggestedSide.toFixed(2)+' × '+suggestedSide.toFixed(2)+' m' : '—'}</td></tr>
+    <tr><td>Índice frente a arrancamiento</td><td class="num" style="color:${ok?'var(--ok)':'var(--warn)'}">${ok?'≥ referencia 1,5':'< referencia 1,5'}</td></tr>
   `;
 
   const warnBox = document.getElementById('warnZapataUplift');
@@ -1110,7 +1147,11 @@ function renderFootingUplift(wind){
     warnBox.classList.add('show');
     warnBox.innerHTML = `Con estas dimensiones, el factor de seguridad frente a arrancamiento (${FS.toFixed(2)}) no llega al mínimo recomendado (${FS_MIN_UPLIFT.toFixed(1)}). Opciones, de menor a mayor costo: vincular la zapata a la platea/contrapiso general para sumar peso resistente (si la platea ya está prevista, el costo adicional es bajo), o agrandar la zapata de forma aislada (ancho/largo pesa más que profundidad para este chequeo, porque abre el cono de tierra — pero implica más excavación y hormigón extra).`;
   } else {
-    warnBox.classList.remove('show');
+    warnBox.classList.add('show');
+    warnBox.style.borderLeftColor = 'var(--steel)';
+    warnBox.style.background = '#F2F0EA';
+    warnBox.style.color = 'var(--ink-soft)';
+    warnBox.innerHTML = `El indicador supera 1,5 solo para el modelo de peso propio y cono de suelo. No confirma la fundación: verificar capacidad portante, deslizamiento, vuelco, punzonado, napa y anclaje al hormigón.`;
   }
 }
 
@@ -1142,8 +1183,8 @@ function renderBracing({width, wallH, ridgeH, deg}, wind){
     <tr><td>Ángulo de la diagonal respecto a la horizontal</td><td class="num">${anguloDeg2.toFixed(1)}°</td></tr>
     <tr style="font-weight:700;"><td>Tracción en la diagonal (trabaja sola, la comprimida se desprecia)</td><td class="num">${diagonalTension.toFixed(0)} kg</td></tr>
     <tr><td>Diagonal elegida</td><td class="num">Ø${diagonalDiam} mm</td></tr>
-    <tr><td>Capacidad admisible a tracción</td><td class="num">${diagonalCap.toFixed(0)} kg</td></tr>
-    <tr><td>Resultado</td><td class="num" style="color:${ok?'var(--ok)':'var(--warn)'}">${ok?'✔ diagonal suficiente (orientativo)':'⚠ diagonal insuficiente (orientativo)'}</td></tr>
+    <tr><td>Resistencia de referencia del redondo</td><td class="num">${diagonalCap.toFixed(0)} kg</td></tr>
+    <tr><td>Comparación de acero</td><td class="num" style="color:${ok?'var(--ok)':'var(--warn)'}">${ok?'demanda ≤ referencia':'demanda > referencia'}</td></tr>
   `;
 
   const warnBox = document.getElementById('warnArriostramiento');
@@ -1151,7 +1192,11 @@ function renderBracing({width, wallH, ridgeH, deg}, wind){
     warnBox.classList.add('show');
     warnBox.innerHTML = `Con Ø${diagonalDiam}mm, la capacidad admisible (${diagonalCap.toFixed(0)} kg) no cubre la tracción estimada en la diagonal (${diagonalTension.toFixed(0)} kg). Opciones, de menor a mayor costo: subir el diámetro de la diagonal (costo bajo, un solo elemento), arriostrar un paño adicional en cada testero (costo medio, más varillas y conexiones), o arriostrar ambos testeros si hoy está configurado solo uno (costo medio-alto, duplica el sistema).`;
   } else {
-    warnBox.classList.remove('show');
+    warnBox.classList.add('show');
+    warnBox.style.borderLeftColor = 'var(--steel)';
+    warnBox.style.background = '#F2F0EA';
+    warnBox.style.color = 'var(--ink-soft)';
+    warnBox.innerHTML = `La tracción estimada queda por debajo de la referencia del redondo, pero falta diseñar cartelas, uniones y el arriostramiento del plano de cubierta que lleva esta fuerza hasta el testero.`;
   }
 }
 
@@ -1290,7 +1335,11 @@ function renderRoofMaterials({width, wallH, ridgeH, rafterLen, deg}, base){
   const panelWidth = parseFloat($panelWidth.value)||1.22;
   const panelHeight = parseFloat($panelHeight.value)||2.44;
   const panelArea = panelWidth*panelHeight;
-  const roofPanelCount = Math.ceil(roofArea/panelArea);
+  // Each roof slope is its own rectangle. Compare both panel orientations and
+  // buy complete panels, not only the theoretical covered area.
+  const roofPanelCount = calculateRoofPanelCount({depth, slopeLength:rafterLen, panelWidth, panelHeight});
+  const purchasedSheetArea = totalSheets*rafterLen*usableSheetWidth;
+  const purchasedPlywoodArea = roofPanelCount*panelArea;
 
   document.getElementById('tablaMatTecho').innerHTML = `
     <tr><th>Ítem</th><th>Estimación</th></tr>
@@ -1302,22 +1351,20 @@ function renderRoofMaterials({width, wallH, ridgeH, rafterLen, deg}, base){
     <tr><td>Correas — tipo de apoyo</td><td class="num">${$purlinSupportType.value==='continua' ? 'Continua a dos tramos' : 'Tramo simple'}</td></tr>
     <tr><td>Correas — metros lineales</td><td class="num">${totalPurlinLength.toFixed(1)} m</td></tr>
     <tr><td>Correas — peso aprox.</td><td class="num">${purlinWeight.toFixed(0)} kg</td></tr>
-    <tr><td>Viga/dintel — perfil</td><td class="num">${viga.label}</td></tr>
+    <tr><td>Viga/dintel — perfil para peso preliminar</td><td class="num">${viga.label}</td></tr>
     <tr><td>Viga/dintel — piezas / metros lineales</td><td class="num">${beamPieces} piezas / ${totalBeamLength.toFixed(1)} m</td></tr>
     <tr><td>Viga/dintel — peso aprox.</td><td class="num">${beamWeight!=null ? beamWeight.toFixed(0)+' kg' : 'consultar (luz &gt; 5.5 m)'}</td></tr>
     <tr><td>Lana de roca — área a cubrir en techo</td><td class="num">${roofArea.toFixed(1)} m²</td></tr>
     <tr><td>Fenólico — panel considerado</td><td class="num">${panelWidth.toFixed(2)} × ${panelHeight.toFixed(2)} m (${panelArea.toFixed(2)} m²)</td></tr>
     <tr><td>Fenólico — cantidad de paneles (cielorraso bajo pendiente, ambas aguas)</td><td class="num">${roofPanelCount}</td></tr>
   `;
-  return {roofArea, totalPurlinLength, purlinWeight, totalBeamLength, beamWeight, totalSheets, areaLanaTecho:roofArea, areaFenolicoTecho:roofArea, roofPanelCount};
+  return {roofArea, totalPurlinLength, purlinWeight, totalBeamLength, beamWeight, totalSheets, purchasedSheetArea, areaLanaTecho:roofArea, areaFenolicoTecho:purchasedPlywoodArea, roofPanelCount};
 }
 
-function renderWallMaterials({width, wallH, depth}, base){
+function renderWallMaterials({width, wallH, ridgeH, depth}, base){
   const {frameCount, col} = base;
-  const perimeter = 2*(width+depth);
-  const grossArea = perimeter*wallH;
   const openings = parseFloat($openings.value)||0;
-  const netArea = Math.max(0, grossArea-openings);
+  const {perimeter, rectangularArea, gableArea, grossArea, netArea} = calculateWallAreas({width, wallH, ridgeH, depth, openings});
   const panelWidth = parseFloat($panelWidth.value)||1.22;
   const panelHeight = parseFloat($panelHeight.value)||2.44;
   const panelArea = panelWidth*panelHeight;
@@ -1329,17 +1376,19 @@ function renderWallMaterials({width, wallH, depth}, base){
   document.getElementById('tablaMatParedes').innerHTML = `
     <tr><th>Ítem</th><th>Estimación</th></tr>
     <tr><td>Perímetro de paredes</td><td class="num">${perimeter.toFixed(1)} m</td></tr>
+    <tr><td>Área de paredes rectas</td><td class="num">${rectangularArea.toFixed(1)} m²</td></tr>
+    <tr><td>Área de ambos testeros triangulares</td><td class="num">${gableArea.toFixed(1)} m²</td></tr>
     <tr><td>Área bruta de paredes</td><td class="num">${grossArea.toFixed(1)} m²</td></tr>
     <tr><td>Área de aberturas descontada</td><td class="num">${openings.toFixed(1)} m²</td></tr>
     <tr><td>Área neta de paredes</td><td class="num">${netArea.toFixed(1)} m²</td></tr>
     <tr><td>Fenólico — panel considerado</td><td class="num">${panelWidth.toFixed(2)} × ${panelHeight.toFixed(2)} m (${panelArea.toFixed(2)} m²)</td></tr>
     <tr><td>Fenólico — cantidad de paneles</td><td class="num">${panelCount}</td></tr>
-    <tr><td>Columnas — perfil</td><td class="num">${col.label}</td></tr>
+    <tr><td>Columnas — perfil para peso preliminar</td><td class="num">${col.label}</td></tr>
     <tr><td>Columnas — cantidad / metros lineales</td><td class="num">${columnCount} col. / ${totalColumnLength.toFixed(1)} m</td></tr>
     <tr><td>Columnas — peso aprox.</td><td class="num">${columnWeight!=null ? columnWeight.toFixed(0)+' kg' : 'consultar'}</td></tr>
     <tr><td>Lana de roca — área a cubrir en paredes</td><td class="num">${netArea.toFixed(1)} m²</td></tr>
   `;
-  return {perimeter, grossArea, netArea, panelCount, columnCount, totalColumnLength, columnWeight, areaLanaParedes:netArea};
+  return {perimeter, rectangularArea, gableArea, grossArea, netArea, panelCount, purchasedPlywoodArea:panelCount*panelArea, columnCount, totalColumnLength, columnWeight, areaLanaParedes:netArea};
 }
 
 function renderSlabMaterials({width, depth}){
@@ -1367,13 +1416,13 @@ function renderSlabMaterials({width, depth}){
 function renderMaterialsSummary({roof, walls, slab, atticFloor}){
   const totalSteelWeight = (roof.purlinWeight||0) + (roof.beamWeight||0) + (walls.columnWeight||0) + (atticFloor.totalAtticFloorWeight||0);
   const woolAreaTotal = (roof.areaLanaTecho||0) + (walls.areaLanaParedes||0);
-  const plywoodAreaTotal = (roof.areaFenolicoTecho||0) + (walls.netArea||0);
+  const plywoodAreaTotal = (roof.areaFenolicoTecho||0) + (walls.purchasedPlywoodArea||0);
   const plywoodPanelCountTotal = (roof.roofPanelCount||0) + (walls.panelCount||0);
   document.getElementById('tablaMatResumen').innerHTML = `
     <tr><th>Ítem</th><th>Total estimado</th></tr>
     <tr><td>Acero estructural (correas + vigas + columnas + piso altillo)</td><td class="num">${totalSteelWeight.toFixed(0)} kg</td></tr>
-    <tr><td>Chapa de techo</td><td class="num">${roof.totalSheets} chapas (${roof.roofArea.toFixed(1)} m²)</td></tr>
-    <tr><td>Panel fenólico (techo + paredes)</td><td class="num">${plywoodPanelCountTotal} paneles (${plywoodAreaTotal.toFixed(1)} m²)</td></tr>
+    <tr><td>Chapa de techo</td><td class="num">${roof.totalSheets} chapas (${roof.purchasedSheetArea.toFixed(1)} m² comprados)</td></tr>
+    <tr><td>Panel fenólico (techo + paredes)</td><td class="num">${plywoodPanelCountTotal} paneles (${plywoodAreaTotal.toFixed(1)} m² comprados)</td></tr>
     <tr><td>Lana de roca (techo + paredes)</td><td class="num">${woolAreaTotal.toFixed(1)} m²</td></tr>
     <tr><td>Hormigón de platea</td><td class="num">${slab.volume.toFixed(2)} m³</td></tr>
     <tr><td>Cemento de platea</td><td class="num">${Math.ceil(slab.cementBags)} bolsas</td></tr>
@@ -1392,10 +1441,10 @@ function renderCosts({roof, walls, slab, atticFloor}){
 
   const totalSteelWeight = (roof.purlinWeight||0) + (roof.beamWeight||0) + (walls.columnWeight||0) + (atticFloor.totalAtticFloorWeight||0);
   const woolAreaTotal = (roof.areaLanaTecho||0) + (walls.areaLanaParedes||0);
-  const plywoodAreaTotal = (roof.areaFenolicoTecho||0) + (walls.netArea||0);
+  const plywoodAreaTotal = (roof.areaFenolicoTecho||0) + (walls.purchasedPlywoodArea||0);
 
   const steelCost = totalSteelWeight*steelPrice;
-  const sheetCost = roof.roofArea*sheetPrice;
+  const sheetCost = roof.purchasedSheetArea*sheetPrice;
   const plywoodCost = plywoodAreaTotal*plywoodPrice;
   const woolCost = woolAreaTotal*woolPrice;
   const cementCost = Math.ceil(slab.cementBags)*cementPrice;
@@ -1409,8 +1458,8 @@ function renderCosts({roof, walls, slab, atticFloor}){
   document.getElementById('tablaCostos').innerHTML = `
     <tr><th>Ítem</th><th>Cantidad</th><th>Costo estimado</th></tr>
     <tr><td>Acero estructural (correas + vigas + columnas + piso altillo)</td><td class="num">${totalSteelWeight.toFixed(0)} kg</td><td class="num">${fmt(steelCost)}</td></tr>
-    <tr><td>Chapa de techo</td><td class="num">${roof.roofArea.toFixed(1)} m²</td><td class="num">${fmt(sheetCost)}</td></tr>
-    <tr><td>Panel fenólico (techo + paredes)</td><td class="num">${plywoodAreaTotal.toFixed(1)} m²</td><td class="num">${fmt(plywoodCost)}</td></tr>
+    <tr><td>Chapa de techo</td><td class="num">${roof.purchasedSheetArea.toFixed(1)} m² (${roof.totalSheets} chapas)</td><td class="num">${fmt(sheetCost)}</td></tr>
+    <tr><td>Panel fenólico (techo + paredes)</td><td class="num">${plywoodAreaTotal.toFixed(1)} m² (${roof.roofPanelCount+walls.panelCount} placas)</td><td class="num">${fmt(plywoodCost)}</td></tr>
     <tr><td>Lana de roca (techo + paredes)</td><td class="num">${woolAreaTotal.toFixed(1)} m²</td><td class="num">${fmt(woolCost)}</td></tr>
     <tr><td>Cemento (platea)</td><td class="num">${Math.ceil(slab.cementBags)} bolsas</td><td class="num">${fmt(cementCost)}</td></tr>
     <tr><td>Arena (platea)</td><td class="num">${slab.sandM3.toFixed(2)} m³</td><td class="num">${fmt(sandCost)}</td></tr>
@@ -1427,7 +1476,7 @@ function renderAllMaterials({width, wallH, ridgeH, rafterLen, deg}){
   cards.forEach(c=>c.style.display='block');
   const base = computeBaseMaterials({width, wallH, ridgeH, rafterLen, deg});
   const roof = renderRoofMaterials({width, wallH, ridgeH, rafterLen, deg}, base);
-  const walls = renderWallMaterials({width, wallH, depth}, base);
+  const walls = renderWallMaterials({width, wallH, ridgeH, depth}, base);
   const slab = renderSlabMaterials({width, depth});
   const atticFloor = renderAtticFloorMaterials({width, wallH, ridgeH, rafterLen, deg});
   renderMaterialsSummary({roof, walls, slab, atticFloor});
@@ -1756,7 +1805,7 @@ function renderAnchorDetail({width, wallH, ridgeH, rafterLen, deg}){
   const overhang = parseFloat($plateOverhang.value)||45;
   const plateThicknessMm = parseFloat($plateThickness.value)||9.5;
   const footingWidthMm = (parseFloat($footingWidth.value)||0.9)*1000;
-  const footingDepthMm = (parseFloat($footingDepth.value)||0.7)*1000;
+  const footingDepthMm = Math.min(parseFloat($footingThickness.value)||0.35, parseFloat($footingDepth.value)||0.7)*1000;
 
   const half = columnWidth/2 + overhang;
   const plateSide = columnWidth + 2*overhang;
@@ -1925,10 +1974,12 @@ $plateTribWidth.addEventListener('input', ()=>recalc());
 $footingWidth.addEventListener('input', ()=>recalc());
 $footingLength.addEventListener('input', ()=>recalc());
 $footingDepth.addEventListener('input', ()=>recalc());
+$footingThickness.addEventListener('input', ()=>recalc());
 $soilDensity.addEventListener('input', ()=>recalc());
 $bracedGables.addEventListener('change', ()=>recalc());
 $diagonalDiameter.addEventListener('change', ()=>recalc());
 $atticLength.addEventListener('input', ()=>recalc());
+$atticWidth.addEventListener('input', ()=>recalc());
 $atticUse.addEventListener('change', ()=>recalc());
 $hasAttic.addEventListener('change', ()=>recalc());
 $floorProfile.addEventListener('change', ()=>recalc());

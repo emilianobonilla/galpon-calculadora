@@ -717,6 +717,29 @@ const $priceSteel = el('precioAcero'), $priceSheet = el('precioChapa'), $pricePl
 
 let slopeAngleRad = Math.atan(0.45); // master state of the roof angle
 
+const STORAGE_KEY = 'galponCalculadoraState';
+
+function getPersistedFields(){
+  return Array.from(document.querySelectorAll('.left input[type=number], .left select'));
+}
+function saveState(){
+  const state = {};
+  getPersistedFields().forEach(elm => { if(elm.id) state[elm.id] = elm.value; });
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+function loadState(){
+  let state;
+  try{ state = JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){ state = null; }
+  if(!state) return;
+  if(state.tipoPerfil !== undefined){
+    $profileType.value = state.tipoPerfil;
+    populateSizes();
+  }
+  getPersistedFields().forEach(elm => { if(elm.id in state) elm.value = state[elm.id]; });
+  const deg = parseFloat($angle.value);
+  if(!isNaN(deg)) slopeAngleRad = deg*Math.PI/180;
+}
+
 function clamp(v,min,max){return Math.max(min, Math.min(max, v));}
 
 function populateSizes(){
@@ -1923,7 +1946,11 @@ $floorProfile.innerHTML = FLOOR_BEAMS.map(p=>`<option value="${p.id}">${p.label}
 $floorProfile.value = 'p100x100_16';
 
 populateSizes();
+loadState();
 recalc();
+
+document.querySelector('.left').addEventListener('input', saveState);
+document.querySelector('.left').addEventListener('change', saveState);
 </script>
 </body>
 </html>

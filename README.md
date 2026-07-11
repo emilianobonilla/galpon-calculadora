@@ -27,6 +27,10 @@ Sin instalación ni build. Es una aplicación estática en vanilla JS + SVG:
 Abrí index.html en cualquier navegador.
 ```
 
+Los tipos de caños, sus propiedades y precios por metro se administran desde
+`admin.html`. El catálogo se guarda localmente en el navegador y alimenta los
+selectores y el cálculo de costos de `index.html`.
+
 ## Alcance y límites — IMPORTANTE
 
 Da **números de referencia para pre-dimensionar y llevarle al ingeniero

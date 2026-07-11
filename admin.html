@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración de materiales — Calculadora de galpón</title>
+  <link rel="stylesheet" href="src/admin.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Calculadora de galpón · Catálogo compartido</p>
+        <h1>Administración de materiales</h1>
+        <p class="intro">Cargá los caños disponibles y su precio por metro. Las opciones guardadas aparecen automáticamente en la calculadora.</p>
+      </div>
+      <a class="button secondary" href="index.html">Volver a la calculadora</a>
+    </header>
+
+    <section class="summary" aria-label="Resumen del catálogo">
+      <div><span id="totalItems">0</span><small>materiales</small></div>
+      <div><span id="pricedItems">0</span><small>con precio</small></div>
+      <div><span id="lastSaved">—</span><small>estado</small></div>
+    </section>
+
+    <section class="workspace">
+      <aside class="card editor">
+        <div class="section-heading">
+          <div>
+            <p class="kicker">Ficha del material</p>
+            <h2 id="formTitle">Nuevo material</h2>
+          </div>
+          <button id="newButton" class="text-button" type="button">Limpiar</button>
+        </div>
+
+        <form id="materialForm">
+          <input id="originalId" type="hidden">
+          <label>Uso / familia
+            <select id="type" required>
+              <option value="C">Perfil C para correas</option>
+              <option value="Q">Caño cuadrado para correas</option>
+              <option value="R">Caño rectangular para correas</option>
+              <option value="FLOOR">Caño para piso de altillo</option>
+            </select>
+          </label>
+          <label>Identificador estable
+            <input id="materialId" required pattern="[a-z0-9_]+(-[a-z0-9_]+)*" placeholder="q100x100_30">
+            <small>Minúsculas, números, guion o guion bajo. Vincula la opción guardada en la calculadora.</small>
+          </label>
+          <label>Descripción visible
+            <input id="label" required placeholder="100×100 mm — esp. 3.0 mm">
+          </label>
+          <div class="two-columns">
+            <label>Peso <span>(kg/m)</span>
+              <input id="weight" type="number" min="0" step="0.01" required>
+            </label>
+            <label>Precio <span>($/m)</span>
+              <input id="price" type="number" min="0" step="0.01" required>
+            </label>
+          </div>
+          <label id="spacingField">Separación máxima <span>(m)</span>
+            <input id="spacing" type="number" min="0.1" step="0.05">
+            <small>Se usa para advertir si las correas están demasiado separadas.</small>
+          </label>
+          <label id="spanField" hidden>Luz de referencia a 0,50 m <span>(m)</span>
+            <input id="span" type="number" min="0.1" step="0.05">
+            <small>Se usa para verificar las vigas del piso del altillo.</small>
+          </label>
+          <p id="formError" class="message error" role="alert" hidden></p>
+          <button class="button primary" type="submit">Guardar material</button>
+        </form>
+      </aside>
+
+      <section class="card catalog">
+        <div class="section-heading catalog-heading">
+          <div>
+            <p class="kicker">Opciones de la calculadora</p>
+            <h2>Catálogo de caños</h2>
+          </div>
+          <label class="filter">Filtrar
+            <select id="filterType"><option value="ALL">Todos</option></select>
+          </label>
+        </div>
+        <div id="catalogList" class="catalog-list"></div>
+        <div class="catalog-actions">
+          <p>Los cambios se guardan en este navegador.</p>
+          <button id="resetButton" class="text-button danger" type="button">Restaurar catálogo inicial</button>
+        </div>
+      </section>
+    </section>
+  </main>
+  <script src="src/material-catalog.js"></script>
+  <script src="src/admin.js"></script>
+</body>
+</html>

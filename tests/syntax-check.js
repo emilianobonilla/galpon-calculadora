@@ -28,7 +28,9 @@ if (!match) {
 const tmpDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'galpon-calculadora-'));
 const tmpPath = path.join(tmpDirectory, 'inline-script.js');
 const sourceFiles = [
+  path.join(__dirname, '..', 'src', 'material-catalog.js'),
   path.join(__dirname, '..', 'src', 'calculations.js'),
+  path.join(__dirname, '..', 'src', 'admin.js'),
   tmpPath,
 ];
 fs.writeFileSync(tmpPath, match[1]);

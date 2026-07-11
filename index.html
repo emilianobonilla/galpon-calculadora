@@ -38,6 +38,9 @@ header .eyebrow{
 }
 header h1{margin:4px 0 6px; font-size:26px; letter-spacing:-.01em;}
 header p{margin:0; color:var(--ink-soft); font-size:14px; max-width:720px; line-height:1.5;}
+.header-row{display:flex; justify-content:space-between; align-items:flex-start; gap:20px;}
+.admin-link{border:1px solid var(--ink); color:var(--ink); padding:8px 11px; border-radius:3px; text-decoration:none; font-size:12px; font-weight:600; white-space:nowrap;}
+.admin-link:hover{background:var(--ink); color:#fff;}
 
 .disclaimer{
   background:#fff; border:1px solid var(--paper-edge); border-left:4px solid var(--warn);
@@ -132,10 +135,13 @@ footer{margin-top:26px; font-size:11.5px; color:var(--steel); line-height:1.6; b
 <body>
 <div class="wrap">
 
-  <header>
-    <div class="eyebrow">Pre-diseño estructural · Vista frontal</div>
-    <h1>Calculadora de estructura del galpón</h1>
-    <p>Ajustá el ancho, la altura, la pendiente (o el ángulo, o el largo del hierro) y el perfil estructural. La geometría y el plano se recalculan al instante.</p>
+  <header class="header-row">
+    <div>
+      <div class="eyebrow">Pre-diseño estructural · Vista frontal</div>
+      <h1>Calculadora de estructura del galpón</h1>
+      <p>Ajustá el ancho, la altura, la pendiente (o el ángulo, o el largo del hierro) y el perfil estructural. La geometría y el plano se recalculan al instante.</p>
+    </div>
+    <a class="admin-link" href="admin.html">Administrar materiales</a>
   </header>
 
   <div class="disclaimer">
@@ -623,6 +629,7 @@ footer{margin-top:26px; font-size:11.5px; color:var(--steel); line-height:1.6; b
   </footer>
 </div>
 
+<script src="src/material-catalog.js"></script>
 <script src="src/calculations.js"></script>
 <script>
 const {
@@ -632,48 +639,15 @@ const {
   calculateFootingUplift,
   calculateRoofPanelCount,
 } = StructuralCalculations;
-const PROFILE_C = [
-  {id:'c80x40x16', label:'80×40 mm — esp. 1.6 mm', pesoKgM:2.36, sepMax:1.2},
-  {id:'c80x40x20', label:'80×40 mm — esp. 2.0 mm', pesoKgM:2.95, sepMax:1.4},
-  {id:'c100x50x16', label:'100×50 mm — esp. 1.6 mm', pesoKgM:2.98, sepMax:1.6},
-  {id:'c100x50x20', label:'100×50 mm — esp. 2.0 mm', pesoKgM:3.71, sepMax:1.8},
-  {id:'c150x50x20', label:'150×50 mm — esp. 2.0 mm', pesoKgM:4.60, sepMax:2.2},
-];
-const TUBE_SQUARE = [
-  {id:'q30x30', label:'30×30 mm — esp. 1.6 mm', pesoKgM:1.35, sepMax:1.0},
-  {id:'q40x40_16', label:'40×40 mm — esp. 1.6 mm', pesoKgM:1.85, sepMax:1.3},
-  {id:'q40x40_20', label:'40×40 mm — esp. 2.0 mm', pesoKgM:2.30, sepMax:1.4},
-  {id:'q50x50_16', label:'50×50 mm — esp. 1.6 mm', pesoKgM:2.35, sepMax:1.6},
-  {id:'q50x50_20', label:'50×50 mm — esp. 2.0 mm', pesoKgM:2.95, sepMax:1.8},
-  {id:'q60x60_16', label:'60×60 mm — esp. 1.6 mm', pesoKgM:2.85, sepMax:2.0},
-  {id:'q60x60_20', label:'60×60 mm — esp. 2.0 mm', pesoKgM:3.60, sepMax:2.2},
-  {id:'q70x70_20', label:'70×70 mm — esp. 2.0 mm', pesoKgM:4.20, sepMax:2.5},
-  {id:'q80x80_20', label:'80×80 mm — esp. 2.0 mm', pesoKgM:4.85, sepMax:2.8},
-  {id:'q100x100_20', label:'100×100 mm — esp. 2.0 mm', pesoKgM:6.10, sepMax:3.2},
-];
-const TUBE_RECT = [
-  {id:'r60x40_20', label:'60×40 mm — esp. 2.0 mm', pesoKgM:2.95, sepMax:1.5},
-  {id:'r80x40_20', label:'80×40 mm — esp. 2.0 mm', pesoKgM:3.55, sepMax:1.8},
-  {id:'r100x50_20', label:'100×50 mm — esp. 2.0 mm', pesoKgM:4.55, sepMax:2.2},
-  {id:'r100x60_25', label:'100×60 mm — esp. 2.5 mm', pesoKgM:5.90, sepMax:2.6},
-];
+const materialItems = MaterialCatalog.load();
+const PROFILE_C = MaterialCatalog.group(materialItems, 'C');
+const TUBE_SQUARE = MaterialCatalog.group(materialItems, 'Q');
+const TUBE_RECT = MaterialCatalog.group(materialItems, 'R');
 const CATALOGS = {C:PROFILE_C, Q:TUBE_SQUARE, R:TUBE_RECT};
 
 // --- Attic floor beams: square structural tube, reference max span at 0.5 m beam spacing ---
 // Rule of thumb span/depth ~18-20 for light residential floor (sheet+wood floor+live load). Approximate.
-const FLOOR_BEAMS = [
-  {id:'p30x30', label:'30×30 mm — esp. 1.6 mm', pesoKgM:1.35, spanRef05:0.55},
-  {id:'p40x40_16', label:'40×40 mm — esp. 1.6 mm', pesoKgM:1.85, spanRef05:0.75},
-  {id:'p40x40_20', label:'40×40 mm — esp. 2.0 mm', pesoKgM:2.30, spanRef05:0.85},
-  {id:'p50x50_16', label:'50×50 mm — esp. 1.6 mm', pesoKgM:2.35, spanRef05:0.95},
-  {id:'p50x50_20', label:'50×50 mm — esp. 2.0 mm', pesoKgM:2.95, spanRef05:1.05},
-  {id:'p60x60_16', label:'60×60 mm — esp. 1.6 mm', pesoKgM:2.85, spanRef05:1.15},
-  {id:'p60x60_20', label:'60×60 mm — esp. 2.0 mm', pesoKgM:3.60, spanRef05:1.25},
-  {id:'p70x70_20', label:'70×70 mm — esp. 2.0 mm', pesoKgM:4.20, spanRef05:1.45},
-  {id:'p80x80_20', label:'80×80 mm — esp. 2.0 mm', pesoKgM:4.85, spanRef05:1.65},
-  {id:'p100x100_16', label:'100×100 mm — esp. 1.6 mm', pesoKgM:4.94, spanRef05:1.85},
-  {id:'p100x100_20', label:'100×100 mm — esp. 2.0 mm', pesoKgM:6.10, spanRef05:2.05},
-];
+const FLOOR_BEAMS = MaterialCatalog.group(materialItems, 'FLOOR');
 
 // --- Approximate column preselection (square structural tube) by estimated axial load per column ---
 function chooseColumn(loadKg){
@@ -757,7 +731,14 @@ function loadState(){
 
 function populateSizes(){
   const cat = CATALOGS[$profileType.value];
-  $profileSize.innerHTML = cat.map(p => `<option value="${p.id}">${p.label}</option>`).join('');
+  const previousValue = $profileSize.value;
+  $profileSize.replaceChildren(...cat.map(profile => {
+    const price = profile.pricePerMeter > 0
+      ? ` — $ ${profile.pricePerMeter.toLocaleString('es-UY')}/m`
+      : '';
+    return new Option(profile.label + price, profile.id);
+  }));
+  if(cat.some(profile => profile.id === previousValue)) $profileSize.value = previousValue;
 }
 function currentProfile(){
   const cat = CATALOGS[$profileType.value];
@@ -902,7 +883,7 @@ function renderAtticFloorMaterials({width, wallH, ridgeH, rafterLen, deg}){
     <tr><td>Viga cabezal de apoyo intermedio — metros lineales / peso</td><td class="num">${withMidSupport ? headerLength.toFixed(1)+' m / '+headerWeight.toFixed(0)+' kg' : '— no aplica'}</td></tr>
     <tr style="font-weight:700;"><td>Peso total — estructura de piso del altillo</td><td class="num">${totalAtticFloorWeight.toFixed(0)} kg</td></tr>
   `;
-  return {totalAtticFloorWeight, beamCount, totalBeamLength, beamWeight, headerWeight, withMidSupport};
+  return {totalAtticFloorWeight, beamCount, totalBeamLength, headerLength, beamWeight, headerWeight, withMidSupport, profile};
 }
 
 function renderFrames({width, wallH, ridgeH, rafterLen, deg}){
@@ -1331,7 +1312,7 @@ function renderRoofMaterials({width, wallH, ridgeH, rafterLen, deg}, base){
     <tr><td>Fenólico — panel considerado</td><td class="num">${panelWidth.toFixed(2)} × ${panelHeight.toFixed(2)} m (${panelArea.toFixed(2)} m²)</td></tr>
     <tr><td>Fenólico — cantidad de paneles (cielorraso bajo pendiente, ambas aguas)</td><td class="num">${roofPanelCount}</td></tr>
   `;
-  return {roofArea, totalPurlinLength, purlinWeight, totalBeamLength, beamWeight, totalSheets, purchasedSheetArea, areaLanaTecho:roofArea, areaFenolicoTecho:purchasedPlywoodArea, roofPanelCount};
+  return {roofArea, totalPurlinLength, purlinWeight, purlinProfile, totalBeamLength, beamWeight, totalSheets, purchasedSheetArea, areaLanaTecho:roofArea, areaFenolicoTecho:purchasedPlywoodArea, roofPanelCount};
 }
 
 function renderWallMaterials({width, wallH, ridgeH, depth}, base){
@@ -1412,11 +1393,22 @@ function renderCosts({roof, walls, slab, atticFloor}){
   const gravelPrice = parseFloat($priceGravel.value)||0;
   const meshPrice = parseFloat($priceMesh.value)||0;
 
-  const totalSteelWeight = (roof.purlinWeight||0) + (roof.beamWeight||0) + (walls.columnWeight||0) + (atticFloor.totalAtticFloorWeight||0);
   const woolAreaTotal = (roof.areaLanaTecho||0) + (walls.areaLanaParedes||0);
   const plywoodAreaTotal = (roof.areaFenolicoTecho||0) + (walls.purchasedPlywoodArea||0);
+  const pricedPurlinCost = roof.purlinProfile.pricePerMeter > 0
+    ? roof.totalPurlinLength * roof.purlinProfile.pricePerMeter
+    : null;
+  const pricedFloorLength = (atticFloor.totalBeamLength || 0) + (atticFloor.headerLength || 0);
+  const pricedFloorCost = atticFloor.profile && atticFloor.profile.pricePerMeter > 0
+    ? pricedFloorLength * atticFloor.profile.pricePerMeter
+    : null;
+  const baseSteelWeight = (roof.beamWeight || 0) + (walls.columnWeight || 0);
+  const purlinCost = pricedPurlinCost === null ? roof.purlinWeight * steelPrice : pricedPurlinCost;
+  const floorCost = pricedFloorCost === null
+    ? (atticFloor.totalAtticFloorWeight || 0) * steelPrice
+    : pricedFloorCost;
 
-  const steelCost = totalSteelWeight*steelPrice;
+  const steelCost = baseSteelWeight * steelPrice + purlinCost + floorCost;
   const sheetCost = roof.purchasedSheetArea*sheetPrice;
   const plywoodCost = plywoodAreaTotal*plywoodPrice;
   const woolCost = woolAreaTotal*woolPrice;
@@ -1430,7 +1422,9 @@ function renderCosts({roof, walls, slab, atticFloor}){
 
   document.getElementById('tablaCostos').innerHTML = `
     <tr><th>Ítem</th><th>Cantidad</th><th>Costo estimado</th></tr>
-    <tr><td>Acero estructural (correas + vigas + columnas + piso altillo)</td><td class="num">${totalSteelWeight.toFixed(0)} kg</td><td class="num">${fmt(steelCost)}</td></tr>
+    <tr><td>Correas — ${roof.purlinProfile.label}</td><td class="num">${roof.totalPurlinLength.toFixed(1)} m</td><td class="num">${fmt(purlinCost)}${pricedPurlinCost === null ? ' (precio/kg)' : ''}</td></tr>
+    ${pricedFloorLength > 0 ? `<tr><td>Piso altillo — ${atticFloor.profile.label}</td><td class="num">${pricedFloorLength.toFixed(1)} m</td><td class="num">${fmt(floorCost)}${pricedFloorCost === null ? ' (precio/kg)' : ''}</td></tr>` : ''}
+    <tr><td>Vigas y columnas</td><td class="num">${baseSteelWeight.toFixed(0)} kg</td><td class="num">${fmt(baseSteelWeight*steelPrice)}</td></tr>
     <tr><td>Chapa de techo</td><td class="num">${roof.purchasedSheetArea.toFixed(1)} m² (${roof.totalSheets} chapas)</td><td class="num">${fmt(sheetCost)}</td></tr>
     <tr><td>Panel fenólico (techo + paredes)</td><td class="num">${plywoodAreaTotal.toFixed(1)} m² (${roof.roofPanelCount+walls.panelCount} placas)</td><td class="num">${fmt(plywoodCost)}</td></tr>
     <tr><td>Lana de roca (techo + paredes)</td><td class="num">${woolAreaTotal.toFixed(1)} m²</td><td class="num">${fmt(woolCost)}</td></tr>
@@ -1966,7 +1960,12 @@ $panelHeight.addEventListener('input', ()=>recalc());
 $openings.addEventListener('input', ()=>recalc());
 [$priceSteel,$priceSheet,$pricePlywood,$priceRockWool,$priceCement,$priceSand,$priceGravel,$priceMesh].forEach(inp=>inp.addEventListener('input', ()=>recalc()));
 
-$floorProfile.innerHTML = FLOOR_BEAMS.map(p=>`<option value="${p.id}">${p.label}</option>`).join('');
+$floorProfile.replaceChildren(...FLOOR_BEAMS.map(profile => {
+  const price = profile.pricePerMeter > 0
+    ? ` — $ ${profile.pricePerMeter.toLocaleString('es-UY')}/m`
+    : '';
+  return new Option(profile.label + price, profile.id);
+}));
 $floorProfile.value = 'p100x100_16';
 
 populateSizes();

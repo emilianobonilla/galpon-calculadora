@@ -4,6 +4,6 @@
   "private": true,
   "description": "Calculadora de predimensionado para un galpón nórdico",
   "scripts": {
-    "test": "node tests/syntax-check.js && node tests/calculation-regression.js"
+    "test": "node tests/syntax-check.js && node tests/calculation-regression.js && node tests/material-catalog.js"
   }
 }

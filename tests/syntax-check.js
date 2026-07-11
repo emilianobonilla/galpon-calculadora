@@ -6,7 +6,8 @@
 // Uso: node tests/syntax-check.js
 
 const fs = require('fs');
-const { execSync } = require('child_process');
+const os = require('os');
+const { execFileSync } = require('child_process');
 const path = require('path');
 
 const indexPath = path.join(__dirname, '..', 'index.html');
@@ -24,15 +25,20 @@ if (!match) {
   process.exit(1);
 }
 
-const tmpPath = path.join(__dirname, '_extracted.tmp.js');
+const tmpDirectory = fs.mkdtempSync(path.join(os.tmpdir(), 'galpon-calculadora-'));
+const tmpPath = path.join(tmpDirectory, 'inline-script.js');
+const sourceFiles = [
+  path.join(__dirname, '..', 'src', 'calculations.js'),
+  tmpPath,
+];
 fs.writeFileSync(tmpPath, match[1]);
 
 try {
-  execSync(`node --check "${tmpPath}"`, { stdio: 'inherit' });
+  sourceFiles.forEach(file => execFileSync(process.execPath, ['--check', file], { stdio: 'inherit' }));
   console.log('OK — sintaxis válida.');
 } catch (e) {
   console.error('FALLÓ — hay un error de sintaxis en el script.');
   process.exit(1);
 } finally {
-  fs.unlinkSync(tmpPath);
+  fs.rmSync(tmpDirectory, { recursive: true, force: true });
 }

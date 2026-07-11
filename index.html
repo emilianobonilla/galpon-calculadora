@@ -623,7 +623,15 @@ footer{margin-top:26px; font-size:11.5px; color:var(--steel); line-height:1.6; b
   </footer>
 </div>
 
+<script src="src/calculations.js"></script>
 <script>
+const {
+  CONCRETE_DENSITY,
+  clamp,
+  calculateWallAreas,
+  calculateFootingUplift,
+  calculateRoofPanelCount,
+} = StructuralCalculations;
 const PROFILE_C = [
   {id:'c80x40x16', label:'80×40 mm — esp. 1.6 mm', pesoKgM:2.36, sepMax:1.2},
   {id:'c80x40x20', label:'80×40 mm — esp. 2.0 mm', pesoKgM:2.95, sepMax:1.4},
@@ -705,7 +713,6 @@ const BOLT_CAP = {12:1100, 16:2000, 20:3150, 22:3800}; // allowable tensile capa
 const BOLT_SHEAR_FACTOR = 0.6; // allowable shear capacity, as a fraction of tensile capacity (approximate)
 const CPE_WALL_WINDWARD = 0.8;  // pressure on windward wall — typical value used in most wind codes
 const CPE_NET_LONGITUDINAL = 1.3; // windward + |leeward| combined, for the total longitudinal force on the gable
-const CONCRETE_DENSITY = 2400; // kg/m³
 const FS_MIN_UPLIFT = 1.5; // minimum recommended safety factor against footing uplift
 
 const el = id => document.getElementById(id);
@@ -746,40 +753,6 @@ function loadState(){
   getPersistedFields().forEach(elm => { if(elm.id in state) elm.value = state[elm.id]; });
   const deg = parseFloat($angle.value);
   if(!isNaN(deg)) slopeAngleRad = deg*Math.PI/180;
-}
-
-function clamp(v,min,max){return Math.max(min, Math.min(max, v));}
-
-function calculateWallAreas({width, wallH, ridgeH, depth, openings}){
-  const perimeter = 2*(width+depth);
-  const rectangularArea = perimeter*wallH;
-  const gableArea = width*Math.max(0, ridgeH-wallH); // two triangular testeros
-  const grossArea = rectangularArea+gableArea;
-  const netArea = Math.max(0, grossArea-openings);
-  return {perimeter, rectangularArea, gableArea, grossArea, netArea};
-}
-
-function calculateFootingUplift({width, length, baseDepth, thickness, soilDensity, tension}){
-  const footingThickness = Math.min(Math.max(0, thickness), Math.max(0, baseDepth));
-  const soilCover = Math.max(0, baseDepth-footingThickness);
-  const footingWeight = width*length*footingThickness*CONCRETE_DENSITY;
-  const tan30 = Math.tan(30*Math.PI/180);
-  const topWidth = width + 2*soilCover*tan30;
-  const topLength = length + 2*soilCover*tan30;
-  const A1 = width*length, A2 = topWidth*topLength;
-  const soilVolume = soilCover/3*(A1+A2+Math.sqrt(A1*A2));
-  const soilWeight = soilVolume*soilDensity;
-  const resistingWeight = footingWeight+soilWeight;
-  const FS = tension>0 ? resistingWeight/tension : Infinity;
-  return {footingThickness, soilCover, footingWeight, soilVolume, soilWeight, resistingWeight, FS};
-}
-
-function calculateRoofPanelCount({depth, slopeLength, panelWidth, panelHeight}){
-  const panelsPerSlope = Math.min(
-    Math.ceil(depth/panelWidth)*Math.ceil(slopeLength/panelHeight),
-    Math.ceil(depth/panelHeight)*Math.ceil(slopeLength/panelWidth)
-  );
-  return panelsPerSlope*2;
 }
 
 function populateSizes(){

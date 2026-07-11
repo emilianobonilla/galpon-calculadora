@@ -1,0 +1,9 @@
+{
+  "name": "galpon-calculadora",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Calculadora de predimensionado para un galpón nórdico",
+  "scripts": {
+    "test": "node tests/syntax-check.js && node tests/calculation-regression.js"
+  }
+}

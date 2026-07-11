@@ -1,37 +1,10 @@
 #!/usr/bin/env node
-// Regression tests for the calculation functions embedded in index.html.
+// Regression tests for the framework-independent calculation module.
 // Run with: node tests/calculation-regression.js
 
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 const path = require('node:path');
-
-const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-const script = html.match(/<script>([\s\S]*)<\/script>/)?.[1];
-
-if (!script) throw new Error('No se encontró el script embebido.');
-
-function extractFunction(name) {
-  const start = script.indexOf(`function ${name}(`);
-  if (start < 0) throw new Error(`No se encontró ${name}.`);
-  const signatureEnd = script.indexOf('){', start);
-  if (signatureEnd < 0) throw new Error(`No se encontró el cuerpo de ${name}.`);
-  const bodyStart = signatureEnd + 1;
-  let depth = 0;
-  for (let i = bodyStart; i < script.length; i++) {
-    if (script[i] === '{') depth++;
-    if (script[i] === '}' && --depth === 0) return script.slice(start, i + 1);
-  }
-  throw new Error(`No se pudo extraer ${name}.`);
-}
-
-const pureFunctions = [
-  extractFunction('calculateWallAreas'),
-  extractFunction('calculateFootingUplift'),
-  extractFunction('calculateRoofPanelCount'),
-].join('\n');
-
-const calculations = new Function(`const CONCRETE_DENSITY = 2400; ${pureFunctions}; return { calculateWallAreas, calculateFootingUplift, calculateRoofPanelCount };`)();
+const calculations = require(path.join(__dirname, '..', 'src', 'calculations.js'));
 
 const walls = calculations.calculateWallAreas({
   width: 8, wallH: 2.6, ridgeH: 4.4, depth: 12, openings: 8,
@@ -63,5 +36,11 @@ assert.equal(shallowFooting.soilWeight, 0);
 assert.equal(calculations.calculateRoofPanelCount({
   depth: 12, slopeLength: 4.386, panelWidth: 1.22, panelHeight: 2.44,
 }), 40);
+
+assert.equal(calculations.calculateRoofPanelCount({
+  depth: 12, slopeLength: 4.386, panelWidth: 0, panelHeight: 2.44,
+}), 0);
+
+assert.equal(calculations.clamp(80, 1, 60), 60);
 
 console.log('OK — regresiones de cálculo verificadas.');

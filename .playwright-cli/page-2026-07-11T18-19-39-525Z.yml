@@ -1,0 +1,345 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: Calculadora de galpón · Catálogo compartido
+      - heading "Administración de materiales" [level=1] [ref=e6]
+      - paragraph [ref=e7]: Cargá los caños disponibles y su precio por metro. Las opciones guardadas aparecen automáticamente en la calculadora.
+    - link "Volver a la calculadora" [ref=e8] [cursor=pointer]:
+      - /url: index.html
+  - region "Resumen del catálogo" [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]: "30"
+      - text: materiales
+    - generic [ref=e12]:
+      - generic [ref=e13]: "0"
+      - text: con precio
+    - generic [ref=e14]:
+      - generic [ref=e15]: —
+      - text: estado
+  - generic [ref=e16]:
+    - complementary [ref=e17]:
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - paragraph [ref=e20]: Ficha del material
+          - heading "Nuevo material" [level=2] [ref=e21]
+        - button "Limpiar" [ref=e22] [cursor=pointer]
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - text: Uso / familia
+          - combobox "Uso / familia" [ref=e25]:
+            - option "Perfil C para correas" [selected]
+            - option "Caño cuadrado para correas"
+            - option "Caño rectangular para correas"
+            - option "Caño para piso de altillo"
+        - generic [ref=e26]:
+          - text: Identificador estable
+          - textbox "Identificador estable Minúsculas, números, guion o guion bajo. Vincula la opción guardada en la calculadora." [ref=e27]:
+            - /placeholder: q100x100_30
+          - generic [ref=e28]: Minúsculas, números, guion o guion bajo. Vincula la opción guardada en la calculadora.
+        - generic [ref=e29]:
+          - text: Descripción visible
+          - textbox "Descripción visible" [ref=e30]:
+            - /placeholder: 100×100 mm — esp. 3.0 mm
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - text: Peso (kg/m)
+            - spinbutton "Peso (kg/m)" [ref=e33]
+          - generic [ref=e34]:
+            - text: Precio ($/m)
+            - spinbutton "Precio ($/m)" [ref=e35]
+        - generic [ref=e36]:
+          - text: Separación máxima (m)
+          - spinbutton "Separación máxima (m) Se usa para advertir si las correas están demasiado separadas." [ref=e37]
+          - generic [ref=e38]: Se usa para advertir si las correas están demasiado separadas.
+        - generic [ref=e39]:
+          - text: Luz de referencia a 0,50 m (m)
+          - spinbutton "Luz de referencia a 0,50 m (m) Se usa para verificar las vigas del piso del altillo." [ref=e40]
+          - generic [ref=e41]: Se usa para verificar las vigas del piso del altillo.
+        - button "Guardar material" [ref=e42] [cursor=pointer]
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - paragraph [ref=e46]: Opciones de la calculadora
+          - heading "Catálogo de caños" [level=2] [ref=e47]
+        - generic [ref=e48]:
+          - text: Filtrar
+          - combobox "Filtrar" [ref=e49]:
+            - option "Todos" [selected]
+            - option "Perfil C"
+            - option "Caño cuadrado"
+            - option "Caño rectangular"
+            - option "Caño para piso de altillo"
+      - generic [ref=e50]:
+        - article [ref=e51]:
+          - generic [ref=e52]:
+            - strong [ref=e53]: 80×40 mm — esp. 1.6 mm
+            - text: Perfil C · c80x40x16
+          - generic [ref=e54]: 2.36 kg/m
+          - generic [ref=e55]: Sin precio
+          - generic [ref=e56]:
+            - button "Editar 80×40 mm — esp. 1.6 mm" [ref=e57] [cursor=pointer]: Editar
+            - button "Eliminar 80×40 mm — esp. 1.6 mm" [ref=e58] [cursor=pointer]: Eliminar
+        - article [ref=e59]:
+          - generic [ref=e60]:
+            - strong [ref=e61]: 80×40 mm — esp. 2.0 mm
+            - text: Perfil C · c80x40x20
+          - generic [ref=e62]: 2.95 kg/m
+          - generic [ref=e63]: Sin precio
+          - generic [ref=e64]:
+            - button "Editar 80×40 mm — esp. 2.0 mm" [ref=e65] [cursor=pointer]: Editar
+            - button "Eliminar 80×40 mm — esp. 2.0 mm" [ref=e66] [cursor=pointer]: Eliminar
+        - article [ref=e67]:
+          - generic [ref=e68]:
+            - strong [ref=e69]: 100×50 mm — esp. 1.6 mm
+            - text: Perfil C · c100x50x16
+          - generic [ref=e70]: 2.98 kg/m
+          - generic [ref=e71]: Sin precio
+          - generic [ref=e72]:
+            - button "Editar 100×50 mm — esp. 1.6 mm" [ref=e73] [cursor=pointer]: Editar
+            - button "Eliminar 100×50 mm — esp. 1.6 mm" [ref=e74] [cursor=pointer]: Eliminar
+        - article [ref=e75]:
+          - generic [ref=e76]:
+            - strong [ref=e77]: 100×50 mm — esp. 2.0 mm
+            - text: Perfil C · c100x50x20
+          - generic [ref=e78]: 3.71 kg/m
+          - generic [ref=e79]: Sin precio
+          - generic [ref=e80]:
+            - button "Editar 100×50 mm — esp. 2.0 mm" [ref=e81] [cursor=pointer]: Editar
+            - button "Eliminar 100×50 mm — esp. 2.0 mm" [ref=e82] [cursor=pointer]: Eliminar
+        - article [ref=e83]:
+          - generic [ref=e84]:
+            - strong [ref=e85]: 150×50 mm — esp. 2.0 mm
+            - text: Perfil C · c150x50x20
+          - generic [ref=e86]: 4.60 kg/m
+          - generic [ref=e87]: Sin precio
+          - generic [ref=e88]:
+            - button "Editar 150×50 mm — esp. 2.0 mm" [ref=e89] [cursor=pointer]: Editar
+            - button "Eliminar 150×50 mm — esp. 2.0 mm" [ref=e90] [cursor=pointer]: Eliminar
+        - article [ref=e91]:
+          - generic [ref=e92]:
+            - strong [ref=e93]: 30×30 mm — esp. 1.6 mm
+            - text: Caño cuadrado · q30x30
+          - generic [ref=e94]: 1.35 kg/m
+          - generic [ref=e95]: Sin precio
+          - generic [ref=e96]:
+            - button "Editar 30×30 mm — esp. 1.6 mm" [ref=e97] [cursor=pointer]: Editar
+            - button "Eliminar 30×30 mm — esp. 1.6 mm" [ref=e98] [cursor=pointer]: Eliminar
+        - article [ref=e99]:
+          - generic [ref=e100]:
+            - strong [ref=e101]: 40×40 mm — esp. 1.6 mm
+            - text: Caño cuadrado · q40x40_16
+          - generic [ref=e102]: 1.85 kg/m
+          - generic [ref=e103]: Sin precio
+          - generic [ref=e104]:
+            - button "Editar 40×40 mm — esp. 1.6 mm" [ref=e105] [cursor=pointer]: Editar
+            - button "Eliminar 40×40 mm — esp. 1.6 mm" [ref=e106] [cursor=pointer]: Eliminar
+        - article [ref=e107]:
+          - generic [ref=e108]:
+            - strong [ref=e109]: 40×40 mm — esp. 2.0 mm
+            - text: Caño cuadrado · q40x40_20
+          - generic [ref=e110]: 2.30 kg/m
+          - generic [ref=e111]: Sin precio
+          - generic [ref=e112]:
+            - button "Editar 40×40 mm — esp. 2.0 mm" [ref=e113] [cursor=pointer]: Editar
+            - button "Eliminar 40×40 mm — esp. 2.0 mm" [ref=e114] [cursor=pointer]: Eliminar
+        - article [ref=e115]:
+          - generic [ref=e116]:
+            - strong [ref=e117]: 50×50 mm — esp. 1.6 mm
+            - text: Caño cuadrado · q50x50_16
+          - generic [ref=e118]: 2.35 kg/m
+          - generic [ref=e119]: Sin precio
+          - generic [ref=e120]:
+            - button "Editar 50×50 mm — esp. 1.6 mm" [ref=e121] [cursor=pointer]: Editar
+            - button "Eliminar 50×50 mm — esp. 1.6 mm" [ref=e122] [cursor=pointer]: Eliminar
+        - article [ref=e123]:
+          - generic [ref=e124]:
+            - strong [ref=e125]: 50×50 mm — esp. 2.0 mm
+            - text: Caño cuadrado · q50x50_20
+          - generic [ref=e126]: 2.95 kg/m
+          - generic [ref=e127]: Sin precio
+          - generic [ref=e128]:
+            - button "Editar 50×50 mm — esp. 2.0 mm" [ref=e129] [cursor=pointer]: Editar
+            - button "Eliminar 50×50 mm — esp. 2.0 mm" [ref=e130] [cursor=pointer]: Eliminar
+        - article [ref=e131]:
+          - generic [ref=e132]:
+            - strong [ref=e133]: 60×60 mm — esp. 1.6 mm
+            - text: Caño cuadrado · q60x60_16
+          - generic [ref=e134]: 2.85 kg/m
+          - generic [ref=e135]: Sin precio
+          - generic [ref=e136]:
+            - button "Editar 60×60 mm — esp. 1.6 mm" [ref=e137] [cursor=pointer]: Editar
+            - button "Eliminar 60×60 mm — esp. 1.6 mm" [ref=e138] [cursor=pointer]: Eliminar
+        - article [ref=e139]:
+          - generic [ref=e140]:
+            - strong [ref=e141]: 60×60 mm — esp. 2.0 mm
+            - text: Caño cuadrado · q60x60_20
+          - generic [ref=e142]: 3.60 kg/m
+          - generic [ref=e143]: Sin precio
+          - generic [ref=e144]:
+            - button "Editar 60×60 mm — esp. 2.0 mm" [ref=e145] [cursor=pointer]: Editar
+            - button "Eliminar 60×60 mm — esp. 2.0 mm" [ref=e146] [cursor=pointer]: Eliminar
+        - article [ref=e147]:
+          - generic [ref=e148]:
+            - strong [ref=e149]: 70×70 mm — esp. 2.0 mm
+            - text: Caño cuadrado · q70x70_20
+          - generic [ref=e150]: 4.20 kg/m
+          - generic [ref=e151]: Sin precio
+          - generic [ref=e152]:
+            - button "Editar 70×70 mm — esp. 2.0 mm" [ref=e153] [cursor=pointer]: Editar
+            - button "Eliminar 70×70 mm — esp. 2.0 mm" [ref=e154] [cursor=pointer]: Eliminar
+        - article [ref=e155]:
+          - generic [ref=e156]:
+            - strong [ref=e157]: 80×80 mm — esp. 2.0 mm
+            - text: Caño cuadrado · q80x80_20
+          - generic [ref=e158]: 4.85 kg/m
+          - generic [ref=e159]: Sin precio
+          - generic [ref=e160]:
+            - button "Editar 80×80 mm — esp. 2.0 mm" [ref=e161] [cursor=pointer]: Editar
+            - button "Eliminar 80×80 mm — esp. 2.0 mm" [ref=e162] [cursor=pointer]: Eliminar
+        - article [ref=e163]:
+          - generic [ref=e164]:
+            - strong [ref=e165]: 100×100 mm — esp. 2.0 mm
+            - text: Caño cuadrado · q100x100_20
+          - generic [ref=e166]: 6.10 kg/m
+          - generic [ref=e167]: Sin precio
+          - generic [ref=e168]:
+            - button "Editar 100×100 mm — esp. 2.0 mm" [ref=e169] [cursor=pointer]: Editar
+            - button "Eliminar 100×100 mm — esp. 2.0 mm" [ref=e170] [cursor=pointer]: Eliminar
+        - article [ref=e171]:
+          - generic [ref=e172]:
+            - strong [ref=e173]: 60×40 mm — esp. 2.0 mm
+            - text: Caño rectangular · r60x40_20
+          - generic [ref=e174]: 2.95 kg/m
+          - generic [ref=e175]: Sin precio
+          - generic [ref=e176]:
+            - button "Editar 60×40 mm — esp. 2.0 mm" [ref=e177] [cursor=pointer]: Editar
+            - button "Eliminar 60×40 mm — esp. 2.0 mm" [ref=e178] [cursor=pointer]: Eliminar
+        - article [ref=e179]:
+          - generic [ref=e180]:
+            - strong [ref=e181]: 80×40 mm — esp. 2.0 mm
+            - text: Caño rectangular · r80x40_20
+          - generic [ref=e182]: 3.55 kg/m
+          - generic [ref=e183]: Sin precio
+          - generic [ref=e184]:
+            - button "Editar 80×40 mm — esp. 2.0 mm" [ref=e185] [cursor=pointer]: Editar
+            - button "Eliminar 80×40 mm — esp. 2.0 mm" [ref=e186] [cursor=pointer]: Eliminar
+        - article [ref=e187]:
+          - generic [ref=e188]:
+            - strong [ref=e189]: 100×50 mm — esp. 2.0 mm
+            - text: Caño rectangular · r100x50_20
+          - generic [ref=e190]: 4.55 kg/m
+          - generic [ref=e191]: Sin precio
+          - generic [ref=e192]:
+            - button "Editar 100×50 mm — esp. 2.0 mm" [ref=e193] [cursor=pointer]: Editar
+            - button "Eliminar 100×50 mm — esp. 2.0 mm" [ref=e194] [cursor=pointer]: Eliminar
+        - article [ref=e195]:
+          - generic [ref=e196]:
+            - strong [ref=e197]: 100×60 mm — esp. 2.5 mm
+            - text: Caño rectangular · r100x60_25
+          - generic [ref=e198]: 5.90 kg/m
+          - generic [ref=e199]: Sin precio
+          - generic [ref=e200]:
+            - button "Editar 100×60 mm — esp. 2.5 mm" [ref=e201] [cursor=pointer]: Editar
+            - button "Eliminar 100×60 mm — esp. 2.5 mm" [ref=e202] [cursor=pointer]: Eliminar
+        - article [ref=e203]:
+          - generic [ref=e204]:
+            - strong [ref=e205]: 30×30 mm — esp. 1.6 mm
+            - text: Caño para piso de altillo · p30x30
+          - generic [ref=e206]: 1.35 kg/m
+          - generic [ref=e207]: Sin precio
+          - generic [ref=e208]:
+            - button "Editar 30×30 mm — esp. 1.6 mm" [ref=e209] [cursor=pointer]: Editar
+            - button "Eliminar 30×30 mm — esp. 1.6 mm" [ref=e210] [cursor=pointer]: Eliminar
+        - article [ref=e211]:
+          - generic [ref=e212]:
+            - strong [ref=e213]: 40×40 mm — esp. 1.6 mm
+            - text: Caño para piso de altillo · p40x40_16
+          - generic [ref=e214]: 1.85 kg/m
+          - generic [ref=e215]: Sin precio
+          - generic [ref=e216]:
+            - button "Editar 40×40 mm — esp. 1.6 mm" [ref=e217] [cursor=pointer]: Editar
+            - button "Eliminar 40×40 mm — esp. 1.6 mm" [ref=e218] [cursor=pointer]: Eliminar
+        - article [ref=e219]:
+          - generic [ref=e220]:
+            - strong [ref=e221]: 40×40 mm — esp. 2.0 mm
+            - text: Caño para piso de altillo · p40x40_20
+          - generic [ref=e222]: 2.30 kg/m
+          - generic [ref=e223]: Sin precio
+          - generic [ref=e224]:
+            - button "Editar 40×40 mm — esp. 2.0 mm" [ref=e225] [cursor=pointer]: Editar
+            - button "Eliminar 40×40 mm — esp. 2.0 mm" [ref=e226] [cursor=pointer]: Eliminar
+        - article [ref=e227]:
+          - generic [ref=e228]:
+            - strong [ref=e229]: 50×50 mm — esp. 1.6 mm
+            - text: Caño para piso de altillo · p50x50_16
+          - generic [ref=e230]: 2.35 kg/m
+          - generic [ref=e231]: Sin precio
+          - generic [ref=e232]:
+            - button "Editar 50×50 mm — esp. 1.6 mm" [ref=e233] [cursor=pointer]: Editar
+            - button "Eliminar 50×50 mm — esp. 1.6 mm" [ref=e234] [cursor=pointer]: Eliminar
+        - article [ref=e235]:
+          - generic [ref=e236]:
+            - strong [ref=e237]: 50×50 mm — esp. 2.0 mm
+            - text: Caño para piso de altillo · p50x50_20
+          - generic [ref=e238]: 2.95 kg/m
+          - generic [ref=e239]: Sin precio
+          - generic [ref=e240]:
+            - button "Editar 50×50 mm — esp. 2.0 mm" [ref=e241] [cursor=pointer]: Editar
+            - button "Eliminar 50×50 mm — esp. 2.0 mm" [ref=e242] [cursor=pointer]: Eliminar
+        - article [ref=e243]:
+          - generic [ref=e244]:
+            - strong [ref=e245]: 60×60 mm — esp. 1.6 mm
+            - text: Caño para piso de altillo · p60x60_16
+          - generic [ref=e246]: 2.85 kg/m
+          - generic [ref=e247]: Sin precio
+          - generic [ref=e248]:
+            - button "Editar 60×60 mm — esp. 1.6 mm" [ref=e249] [cursor=pointer]: Editar
+            - button "Eliminar 60×60 mm — esp. 1.6 mm" [ref=e250] [cursor=pointer]: Eliminar
+        - article [ref=e251]:
+          - generic [ref=e252]:
+            - strong [ref=e253]: 60×60 mm — esp. 2.0 mm
+            - text: Caño para piso de altillo · p60x60_20
+          - generic [ref=e254]: 3.60 kg/m
+          - generic [ref=e255]: Sin precio
+          - generic [ref=e256]:
+            - button "Editar 60×60 mm — esp. 2.0 mm" [ref=e257] [cursor=pointer]: Editar
+            - button "Eliminar 60×60 mm — esp. 2.0 mm" [ref=e258] [cursor=pointer]: Eliminar
+        - article [ref=e259]:
+          - generic [ref=e260]:
+            - strong [ref=e261]: 70×70 mm — esp. 2.0 mm
+            - text: Caño para piso de altillo · p70x70_20
+          - generic [ref=e262]: 4.20 kg/m
+          - generic [ref=e263]: Sin precio
+          - generic [ref=e264]:
+            - button "Editar 70×70 mm — esp. 2.0 mm" [ref=e265] [cursor=pointer]: Editar
+            - button "Eliminar 70×70 mm — esp. 2.0 mm" [ref=e266] [cursor=pointer]: Eliminar
+        - article [ref=e267]:
+          - generic [ref=e268]:
+            - strong [ref=e269]: 80×80 mm — esp. 2.0 mm
+            - text: Caño para piso de altillo · p80x80_20
+          - generic [ref=e270]: 4.85 kg/m
+          - generic [ref=e271]: Sin precio
+          - generic [ref=e272]:
+            - button "Editar 80×80 mm — esp. 2.0 mm" [ref=e273] [cursor=pointer]: Editar
+            - button "Eliminar 80×80 mm — esp. 2.0 mm" [ref=e274] [cursor=pointer]: Eliminar
+        - article [ref=e275]:
+          - generic [ref=e276]:
+            - strong [ref=e277]: 100×100 mm — esp. 1.6 mm
+            - text: Caño para piso de altillo · p100x100_16
+          - generic [ref=e278]: 4.94 kg/m
+          - generic [ref=e279]: Sin precio
+          - generic [ref=e280]:
+            - button "Editar 100×100 mm — esp. 1.6 mm" [ref=e281] [cursor=pointer]: Editar
+            - button "Eliminar 100×100 mm — esp. 1.6 mm" [ref=e282] [cursor=pointer]: Eliminar
+        - article [ref=e283]:
+          - generic [ref=e284]:
+            - strong [ref=e285]: 100×100 mm — esp. 2.0 mm
+            - text: Caño para piso de altillo · p100x100_20
+          - generic [ref=e286]: 6.10 kg/m
+          - generic [ref=e287]: Sin precio
+          - generic [ref=e288]:
+            - button "Editar 100×100 mm — esp. 2.0 mm" [ref=e289] [cursor=pointer]: Editar
+            - button "Eliminar 100×100 mm — esp. 2.0 mm" [ref=e290] [cursor=pointer]: Eliminar
+      - generic [ref=e291]:
+        - paragraph [ref=e292]: Los cambios se guardan en este navegador.
+        - button "Restaurar catálogo inicial" [ref=e293] [cursor=pointer]

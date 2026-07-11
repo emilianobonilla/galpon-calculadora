@@ -21,12 +21,15 @@ Villa Serrana, Lavalleja, Uruguay.
 
 ## Cómo usarla
 
-Sin instalación ni build. Es un único archivo HTML autocontenido
-(vanilla JS + SVG inline):
+Sin instalación ni build. Es una aplicación estática en vanilla JS + SVG:
 
 ```
 Abrí index.html en cualquier navegador.
 ```
+
+Los tipos de caños, sus propiedades y precios por metro se administran desde
+`admin.html`. El catálogo se guarda localmente en el navegador y alimenta los
+selectores y el cálculo de costos de `index.html`.
 
 ## Alcance y límites — IMPORTANTE
 
@@ -46,8 +49,9 @@ particular:
 - Cada cambio funcional = un commit, con mensaje descriptivo (ver
   convención abajo).
 - Tests de lógica numérica en `tests/`, corridos con Node.js (sin
-  dependencias externas; usan `node --check` y jsdom para el DOM cuando
-  aplica).
+  dependencias externas). Ejecutar todos con `npm test`.
+- La lógica numérica independiente del DOM vive en `src/calculations.js`;
+  puede probarse sin cargar un navegador.
 - `CHANGELOG.md` lleva el registro de versiones — actualizarlo en cada
   release, no en cada commit.
 

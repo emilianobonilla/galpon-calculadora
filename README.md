@@ -53,13 +53,15 @@ particular:
 
 ### Convención de mensajes de commit
 
-```
-tipo: descripción corta en infinitivo
+Mensajes de commit en inglés, imperativo corto:
 
-fix: corregir zapata por arrancamiento de viento
-feat: agregar módulo de escalera al altillo
-docs: actualizar README con alcance de Cpe
-refactor: extraer cálculo de anclaje a función propia
+```
+type: short imperative description
+
+fix: correct footing uplift check
+feat: add attic staircase module
+docs: update README with Cpe scope
+refactor: extract anchor calculation into its own function
 ```
 
 ## Estado

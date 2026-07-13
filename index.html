@@ -116,6 +116,22 @@ header p{margin:0; color:var(--ink-soft); font-size:14px; max-width:720px; line-
 .diagram-card.is-input-detail{border:1px solid rgba(242,184,75,.55);}
 .diagram-card.is-input-detail .tag{color:#F2B84B;}
 
+.export-bar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:12px;}
+.export-bar .export-label{
+  font-family:'JetBrains Mono', monospace; font-size:10.5px; color:var(--line);
+  letter-spacing:.12em; text-transform:uppercase; margin-right:2px;
+}
+.export-bar button{
+  font-family:'IBM Plex Sans', sans-serif; font-size:12px; font-weight:600;
+  color:var(--navy-deep); background:var(--line); border:none; border-radius:3px;
+  padding:8px 12px; cursor:pointer;
+}
+.export-bar button:hover{background:var(--line-bright);}
+.export-bar .export-hint{
+  flex-basis:100%; font-family:'JetBrains Mono', monospace; font-size:9.5px;
+  color:var(--steel); margin-top:2px; line-height:1.5;
+}
+
 .results{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px;}
 @media (max-width:700px){.results{grid-template-columns:repeat(2,1fr);}}
 .stat{
@@ -491,6 +507,12 @@ footer{margin-top:26px; font-size:11.5px; color:var(--steel); line-height:1.6; b
       <div class="diagram-card">
         <div class="tag">Vista isométrica — volumen general</div>
         <svg id="diagramIso" viewBox="0 0 800 560" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div class="export-bar">
+          <span class="export-label">Exportar 3D</span>
+          <button type="button" id="exportDxf">Barras · DXF (FreeCAD)</button>
+          <button type="button" id="exportObj">Superficies · OBJ (Blender)</button>
+          <span class="export-hint">DXF: esqueleto de pórticos, columnas, cabios y correas longitudinales (Z arriba, nativo en FreeCAD). OBJ: volumen cerrado con paredes, techo y frontones para render en Blender (al importar, elegí eje "Z Up").</span>
+        </div>
       </div>
 
       <div class="diagram-card is-input-detail">
@@ -2075,6 +2097,120 @@ recalc();
 
 document.querySelector('.left').addEventListener('input', saveState);
 document.querySelector('.left').addEventListener('change', saveState);
+
+// --- 3D export (DXF wireframe for FreeCAD, OBJ surfaces for Blender) ---
+// Coordinate system: X = ancho (span), Y = profundidad (largo), Z = altura (arriba).
+// Right-handed, Z-up: native in FreeCAD and DXF; in Blender's OBJ import pick "Z Up".
+function exportGeometry(){
+  const width = parseFloat($width.value) || 0;
+  const wallH = parseFloat($wallHeight.value) || 0;
+  const ridgeH = wallH + (width/2)*Math.tan(slopeAngleRad);
+  const spacing = parseFloat($frameSpacing.value) || 3.2;
+  const depth = Math.max(parseFloat($depth.value) || 0, spacing);
+
+  // Frame stations along depth: 0, spacing, 2*spacing, ..., and always one at depth.
+  const frames = [];
+  for(let y=0; y < depth - 1e-6; y += spacing) frames.push(y);
+  if(frames.length === 0 || Math.abs(frames[frames.length-1] - depth) > 1e-6) frames.push(depth);
+
+  // Portal-frame profile nodes at a given depth y (A base-left, B base-right,
+  // C eave-right, D ridge, E eave-left).
+  const nodesAt = y => ({
+    A:[0,        y, 0],
+    B:[width,    y, 0],
+    C:[width,    y, wallH],
+    D:[width/2,  y, ridgeH],
+    E:[0,        y, wallH],
+  });
+
+  return {width, wallH, ridgeH, depth, spacing, frames, nodesAt};
+}
+
+function triggerDownload(filename, text, mime){
+  const blob = new Blob([text], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+function buildDxf(){
+  const g = exportGeometry();
+  const lines = []; // {layer, p1, p2}
+  // Each frame: two columns + two rafters (the "barras" of the pórtico).
+  g.frames.forEach(y=>{
+    const n = g.nodesAt(y);
+    lines.push({layer:'PORTICOS', a:n.A, b:n.E}); // columna izq
+    lines.push({layer:'PORTICOS', a:n.B, b:n.C}); // columna der
+    lines.push({layer:'PORTICOS', a:n.E, b:n.D}); // cabio izq
+    lines.push({layer:'PORTICOS', a:n.C, b:n.D}); // cabio der
+    lines.push({layer:'BASE',     a:n.A, b:n.B}); // atado de base
+  });
+  // Longitudinal members connecting consecutive frames at each node
+  // (rieles de base, correas de alero y cumbrera).
+  for(let i=0; i<g.frames.length-1; i++){
+    const n1 = g.nodesAt(g.frames[i]), n2 = g.nodesAt(g.frames[i+1]);
+    ['A','B'].forEach(k => lines.push({layer:'BASE',        a:n1[k], b:n2[k]}));
+    ['C','E'].forEach(k => lines.push({layer:'CORREAS',     a:n1[k], b:n2[k]}));
+    lines.push({layer:'CUMBRERA', a:n1.D, b:n2.D});
+  }
+
+  const out = ['0','SECTION','2','ENTITIES'];
+  const num = v => v.toFixed(4);
+  lines.forEach(l=>{
+    out.push('0','LINE','8',l.layer,
+      '10',num(l.a[0]),'20',num(l.a[1]),'30',num(l.a[2]),
+      '11',num(l.b[0]),'21',num(l.b[1]),'31',num(l.b[2]));
+  });
+  out.push('0','ENDSEC','0','EOF');
+  return out.join('\n') + '\n';
+}
+
+function buildObj(){
+  const g = exportGeometry();
+  const front = g.nodesAt(0), back = g.nodesAt(g.depth);
+  // 10 vertices: A B C D E at y=0, then at y=depth.
+  const order = ['A','B','C','D','E'];
+  const verts = [];
+  order.forEach(k => verts.push(front[k]));
+  order.forEach(k => verts.push(back[k]));
+  const iA=1,iB=2,iC=3,iD=4,iE=5, jA=6,jB=7,jC=8,jD=9,jE=10; // 1-indexed OBJ
+
+  const out = [
+    '# Galpón nórdico — exportado desde la calculadora',
+    `# ancho=${g.width} m  profundidad=${g.depth} m  pared=${g.wallH.toFixed(2)} m  cumbrera=${g.ridgeH.toFixed(2)} m`,
+    '# Ejes: X=ancho, Y=profundidad, Z=altura (Z-up). En Blender importar con Up=Z.',
+    'o Galpon',
+  ];
+  verts.forEach(v => out.push(`v ${v[0].toFixed(4)} ${v[1].toFixed(4)} ${v[2].toFixed(4)}`));
+  out.push('g paredes');
+  out.push(`f ${iA} ${iE} ${jE} ${jA}`); // pared izquierda
+  out.push(`f ${iB} ${jB} ${jC} ${iC}`); // pared derecha
+  out.push('g techo');
+  out.push(`f ${iE} ${iD} ${jD} ${jE}`); // faldón izquierdo
+  out.push(`f ${iC} ${jC} ${jD} ${iD}`); // faldón derecho
+  out.push('g frontones');
+  out.push(`f ${iA} ${iB} ${iC} ${iD} ${iE}`); // frontón frente
+  out.push(`f ${jA} ${jE} ${jD} ${jC} ${jB}`); // frontón fondo
+  out.push('g piso');
+  out.push(`f ${iA} ${jA} ${jB} ${iB}`); // piso
+  return out.join('\n') + '\n';
+}
+
+function dims(){
+  const w = (parseFloat($width.value)||0).toFixed(1);
+  const spacing = parseFloat($frameSpacing.value)||3.2;
+  const d = Math.max(parseFloat($depth.value)||0, spacing).toFixed(1);
+  return `${w}x${d}`;
+}
+
+document.getElementById('exportDxf').addEventListener('click', ()=>{
+  triggerDownload(`galpon_${dims()}.dxf`, buildDxf(), 'application/dxf');
+});
+document.getElementById('exportObj').addEventListener('click', ()=>{
+  triggerDownload(`galpon_${dims()}.obj`, buildObj(), 'model/obj');
+});
 </script>
 </body>
 </html>

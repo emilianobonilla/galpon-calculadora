@@ -108,7 +108,13 @@ header p{margin:0; color:var(--ink-soft); font-size:14px; max-width:720px; line-
   font-family:'JetBrains Mono', monospace; font-size:10.5px; color:var(--line);
   letter-spacing:.12em; text-transform:uppercase; margin-bottom:6px;
 }
-svg#diagram{width:100%; height:auto; display:block;}
+.diagram-card svg{width:100%; height:auto; display:block;}
+.diagram-card + .diagram-card{margin-top:16px;}
+.diagram-card .diagram-context{
+  margin:0 0 8px; color:rgba(234,246,250,.72); font-size:11px; line-height:1.45;
+}
+.diagram-card.is-input-detail{border:1px solid rgba(242,184,75,.55);}
+.diagram-card.is-input-detail .tag{color:#F2B84B;}
 
 .results{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px;}
 @media (max-width:700px){.results{grid-template-columns:repeat(2,1fr);}}
@@ -487,6 +493,12 @@ footer{margin-top:26px; font-size:11.5px; color:var(--steel); line-height:1.6; b
         <svg id="diagramIso" viewBox="0 0 800 560" xmlns="http://www.w3.org/2000/svg"></svg>
       </div>
 
+      <div class="diagram-card is-input-detail">
+        <div class="tag">Detalle dinámico — perfil estructural de correas</div>
+        <p class="diagram-context">Responde a “Tipo de perfil”, “Medida / espesor” y “Tipo de apoyo de la correa”. La sección se amplía para poder comparar opciones.</p>
+        <svg id="detallePerfil" viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Detalle de la sección y ubicación del perfil estructural elegido"></svg>
+      </div>
+
       <div class="diagram-card">
         <div class="tag">Detalle — anclaje de columna y placa base</div>
         <svg id="detalleAnclaje" viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -800,6 +812,7 @@ function recalc(source){
   renderDiagram({width, wallH, ridgeH, rafterLen, deg});
   renderDiagramLateral({width, wallH, ridgeH, rafterLen, deg});
   renderDiagramIsometric({width, wallH, ridgeH, deg});
+  renderProfileDetail({width, wallH, ridgeH, rafterLen, deg});
   renderAllMaterials({width, wallH, ridgeH, rafterLen, deg});
   renderFrames({width, wallH, ridgeH, rafterLen, deg});
   const windResult = renderWind({width, wallH, ridgeH, rafterLen, deg});
@@ -1759,6 +1772,94 @@ function renderDiagramIsometric({width, wallH, ridgeH, deg}){
   s_ += `<text x="30" y="${H-38}" text-anchor="start" font-size="9.5" fill="#56646C" font-family="JetBrains Mono, monospace">Proyección isométrica real — misma escala en los 3 ejes (X/Y/Z)</text>`;
 
   svg.innerHTML = s_;
+}
+
+function profileSectionGeometry(profile, type){
+  const dimensions = [...profile.label.matchAll(/(\d+(?:[.,]\d+)?)\s*[×x]/gi)]
+    .map(match => parseFloat(match[1].replace(',', '.')));
+  const lastDimension = profile.label.match(/[×x]\s*(\d+(?:[.,]\d+)?)\s*mm/i);
+  if(lastDimension) dimensions.push(parseFloat(lastDimension[1].replace(',', '.')));
+  const thicknessMatch = profile.label.match(/esp\.\s*(\d+(?:[.,]\d+)?)\s*mm/i);
+  const thickness = thicknessMatch ? parseFloat(thicknessMatch[1].replace(',', '.')) : 1.6;
+
+  if(type === 'C') return {width:dimensions[1] || 40, height:dimensions[0] || 80, thickness, kind:'open'};
+  if(type === 'R') return {width:dimensions[1] || 40, height:dimensions[0] || 60, thickness, kind:'closed'};
+  return {width:dimensions[0] || 40, height:dimensions[0] || 40, thickness, kind:'closed'};
+}
+
+function renderProfileDetail({width, wallH, ridgeH, rafterLen, deg}){
+  const svg = document.getElementById('detallePerfil');
+  const profile = currentProfile();
+  const geometry = profileSectionGeometry(profile, $profileType.value);
+  const supportType = $purlinSupportType.value;
+  const supportFactor = supportType === 'continua' ? 1.45 : 1;
+  const effectiveMaxSpacing = profile.sepMax * supportFactor;
+  const frameSpacing = parseFloat($frameSpacing.value) || 0;
+  const spacingOk = frameSpacing <= effectiveMaxSpacing;
+  const sectionBox = {x:60, y:76, w:260, h:235};
+  const maxSection = Math.max(geometry.width, geometry.height);
+  const scale = Math.min(170/maxSection, 3.1);
+  const sw = geometry.width*scale, sh = geometry.height*scale;
+  const sx = sectionBox.x + (sectionBox.w-sw)/2;
+  const sy = sectionBox.y + (sectionBox.h-sh)/2;
+  const visualThickness = Math.max(5, geometry.thickness*scale);
+  const amber = '#F2B84B', cyan = '#8FD3E8', white = '#EAF6FA';
+
+  let section;
+  if(geometry.kind === 'open'){
+    section = `<path d="M ${sx+sw} ${sy} H ${sx} V ${sy+sh} H ${sx+sw}" fill="none" stroke="${amber}" stroke-width="${visualThickness}" stroke-linejoin="round"/>`;
+  }else{
+    section = `<rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" rx="2" fill="rgba(242,184,75,.12)" stroke="${amber}" stroke-width="${visualThickness}"/>`;
+    if(sw>2*visualThickness && sh>2*visualThickness) section += `<rect x="${sx+visualThickness}" y="${sy+visualThickness}" width="${sw-2*visualThickness}" height="${sh-2*visualThickness}" fill="#0F2A43" stroke="none"/>`;
+  }
+
+  const roofX0=405, roofX1=755, roofY=160;
+  const roofRise = Math.min(95, Math.tan(deg*Math.PI/180)*(roofX1-roofX0)/2);
+  const roofMid=(roofX0+roofX1)/2, roofTop=roofY-roofRise;
+  let roofProfiles='';
+  const rowCount = Math.max(3, Math.min(7, Math.ceil(rafterLen/1.1)+1));
+  for(let side=0;side<2;side++){
+    const ax=side ? roofMid : roofX0, ay=side ? roofTop : roofY;
+    const bx=side ? roofX1 : roofMid, by=side ? roofY : roofTop;
+    for(let i=0;i<rowCount;i++){
+      const t=i/(rowCount-1), px=ax+(bx-ax)*t, py=ay+(by-ay)*t;
+      roofProfiles += `<circle cx="${px}" cy="${py}" r="4.5" fill="${amber}" stroke="#0F2A43" stroke-width="1.5"/>`;
+    }
+  }
+
+  const supportLabel = supportType === 'continua' ? 'CONTINUA A DOS TRAMOS' : 'TRAMO SIMPLE';
+  const statusColor = spacingOk ? '#7DCE98' : '#F2A78E';
+  const statusText = spacingOk ? 'SEPARACIÓN DENTRO DE REFERENCIA' : 'REVISAR SEPARACIÓN ENTRE PÓRTICOS';
+
+  svg.innerHTML = `
+    <style>
+      #detallePerfil text{font-family:'JetBrains Mono',monospace;fill:${white};}
+      #detallePerfil .dim{stroke:${cyan};stroke-width:1;stroke-dasharray:4 3;opacity:.8;}
+    </style>
+    <text x="60" y="35" font-size="13" fill="${amber}">${profile.label}</text>
+    <text x="60" y="54" font-size="10.5" opacity=".72">SECCIÓN TRANSVERSAL · AMPLIADA</text>
+    ${section}
+    <line x1="${sx}" y1="${sy+sh+18}" x2="${sx+sw}" y2="${sy+sh+18}" class="dim"/>
+    <text x="${sx+sw/2}" y="${sy+sh+36}" text-anchor="middle" font-size="10.5">${geometry.width.toFixed(0)} mm</text>
+    <line x1="${sx-18}" y1="${sy}" x2="${sx-18}" y2="${sy+sh}" class="dim"/>
+    <text x="${sx-30}" y="${sy+sh/2}" text-anchor="middle" font-size="10.5" transform="rotate(-90 ${sx-30} ${sy+sh/2})">${geometry.height.toFixed(0)} mm</text>
+    <text x="190" y="335" text-anchor="middle" font-size="10.5">ESPESOR ${geometry.thickness.toFixed(1)} mm</text>
+
+    <text x="405" y="54" font-size="10.5" opacity=".72">UBICACIÓN EN CADA AGUA DEL TECHO</text>
+    <polyline points="${roofX0},${roofY} ${roofMid},${roofTop} ${roofX1},${roofY}" fill="none" stroke="${cyan}" stroke-width="3"/>
+    ${roofProfiles}
+    <text x="${roofMid}" y="${roofY+27}" text-anchor="middle" font-size="10.5">${rowCount} FILAS / AGUA · PASO APROX. 1,10 m</text>
+    <text x="405" y="230" font-size="10.5" opacity=".72">APOYO ENTRE PÓRTICOS</text>
+    <line x1="425" y1="275" x2="735" y2="275" stroke="${amber}" stroke-width="6" stroke-linecap="round"/>
+    <line x1="425" y1="250" x2="425" y2="300" stroke="${cyan}" stroke-width="5"/>
+    ${supportType === 'continua' ? `<line x1="580" y1="250" x2="580" y2="300" stroke="${cyan}" stroke-width="5"/>` : ''}
+    <line x1="735" y1="250" x2="735" y2="300" stroke="${cyan}" stroke-width="5"/>
+    <text x="580" y="325" text-anchor="middle" font-size="11">${supportLabel}</text>
+    <text x="580" y="345" text-anchor="middle" font-size="10.5">máx. orientativa ${effectiveMaxSpacing.toFixed(2)} m · actual ${frameSpacing.toFixed(2)} m</text>
+    <rect x="405" y="370" width="350" height="28" rx="3" fill="${statusColor}" opacity=".16" stroke="${statusColor}"/>
+    <text x="580" y="389" text-anchor="middle" font-size="10.5" fill="${statusColor}">${statusText}</text>
+    <text x="60" y="389" font-size="10.5">${profile.pesoKgM.toFixed(2)} kg/m</text>
+  `;
 }
 
 function renderAnchorDetail({width, wallH, ridgeH, rafterLen, deg}){

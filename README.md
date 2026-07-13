@@ -5,6 +5,8 @@ y planos técnicos esquemáticos para una vivienda estilo galpón nórdico,
 estructura metálica (pórticos), autoconstruida, en el padrón 15070,
 Villa Serrana, Lavalleja, Uruguay.
 
+**▶ Usala online:** https://emilianobonilla.github.io/galpon-calculadora/
+
 ## Qué hace
 
 - Pre-dimensiona pórticos, columnas, correas y vigas por rango de carga y luz.
@@ -21,11 +23,10 @@ Villa Serrana, Lavalleja, Uruguay.
 
 ## Cómo usarla
 
-Sin instalación ni build. Es una aplicación estática en vanilla JS + SVG:
+Sin instalación ni build. Es una aplicación estática en vanilla JS + SVG.
 
-```
-Abrí index.html en cualquier navegador.
-```
+- **Online:** abrí https://emilianobonilla.github.io/galpon-calculadora/ (GitHub Pages).
+- **Local:** abrí `index.html` en cualquier navegador.
 
 Los tipos de caños, sus propiedades y precios por metro se administran desde
 `admin.html`. El catálogo se guarda localmente en el navegador y alimenta los

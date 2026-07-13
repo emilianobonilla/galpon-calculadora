@@ -511,7 +511,7 @@ footer{margin-top:26px; font-size:11.5px; color:var(--steel); line-height:1.6; b
           <span class="export-label">Exportar 3D</span>
           <button type="button" id="exportDxf">Barras · DXF (FreeCAD)</button>
           <button type="button" id="exportObj">Superficies · OBJ (Blender)</button>
-          <span class="export-hint">DXF: esqueleto de pórticos, columnas, cabios y correas longitudinales (Z arriba, nativo en FreeCAD). OBJ: volumen cerrado con paredes, techo y frontones para render en Blender (al importar, elegí eje "Z Up").</span>
+          <span class="export-hint">DXF: esqueleto de pórticos, columnas, cabios y correas longitudinales (Z arriba, nativo en FreeCAD). OBJ+MTL: modelo sólido con estructura (perfiles), chapa con espesor y colores por parte para render en Blender. Descarga dos archivos (.obj y .mtl) — dejalos en la misma carpeta y al importar elegí eje "Z Up". Cada parte es un objeto: ocultá paredes/techo para ver la estructura.</span>
         </div>
       </div>
 
@@ -2167,34 +2167,134 @@ function buildDxf(){
   return out.join('\n') + '\n';
 }
 
-function buildObj(){
-  const g = exportGeometry();
-  const front = g.nodesAt(0), back = g.nodesAt(g.depth);
-  // 10 vertices: A B C D E at y=0, then at y=depth.
-  const order = ['A','B','C','D','E'];
-  const verts = [];
-  order.forEach(k => verts.push(front[k]));
-  order.forEach(k => verts.push(back[k]));
-  const iA=1,iB=2,iC=3,iD=4,iE=5, jA=6,jB=7,jC=8,jD=9,jE=10; // 1-indexed OBJ
+// Secciones y espesores usados para dar volumen al modelo (metros).
+const OBJ_SECTIONS = {
+  column: 0.16,   // columnas y cabios (perfil cuadrado equivalente)
+  purlin: 0.08,   // correas longitudinales y cumbrera
+  clad:   0.04,   // espesor de chapa de paredes, techo y frontones
+  slab:   0.10,   // espesor de la losa de piso
+};
 
+// Paleta de materiales (RGB 0-1) que se vuelca al .mtl.
+const OBJ_MATERIALS = {
+  acero:         [0.28, 0.31, 0.36], // estructura
+  chapa_pared:   [0.80, 0.82, 0.85], // paredes (galvanizado)
+  chapa_techo:   [0.62, 0.21, 0.17], // techo (color teja)
+  chapa_fronton: [0.74, 0.76, 0.80], // frontones
+  hormigon:      [0.55, 0.55, 0.55], // piso
+};
+
+// Construye la geometría sólida del galpón y devuelve {obj, mtl, mtlName}.
+function buildObjMtl(mtlName){
+  const g = exportGeometry();
+  const S = OBJ_SECTIONS;
+
+  const V = [];                       // vértices (índices 1-based como pide OBJ)
+  const faces = [];                   // {obj, mtl, idx:[...]}
+  const add = p => (V.push(p), V.length);
+  const face = (obj, mtl, idx) => faces.push({obj, mtl, idx});
+  const quad = (obj, mtl, a, b, c, d) => face(obj, mtl, [a, b, c, d]);
+
+  const sub   = (a, b) => [a[0]-b[0], a[1]-b[1], a[2]-b[2]];
+  const addv  = (a, b) => [a[0]+b[0], a[1]+b[1], a[2]+b[2]];
+  const scl   = (a, s) => [a[0]*s, a[1]*s, a[2]*s];
+  const cross = (a, b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+  const dot   = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+  const norm  = a => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0]/l, a[1]/l, a[2]/l]; };
+
+  // Prisma rectangular (perfil sólido) con eje p1→p2 y sección w×h.
+  function beam(obj, mtl, p1, p2, w, h){
+    const axis = norm(sub(p2, p1));
+    let up = Math.abs(dot(axis, [0,0,1])) > 0.98 ? [0,1,0] : [0,0,1];
+    const side = norm(cross(axis, up));
+    up = norm(cross(side, axis));
+    const sw = scl(side, w/2), sh = scl(up, h/2);
+    const corners = p => [
+      addv(addv(p, scl(sw,-1)), scl(sh,-1)),
+      addv(addv(p, sw),         scl(sh,-1)),
+      addv(addv(p, sw),         sh),
+      addv(addv(p, scl(sw,-1)), sh),
+    ];
+    const c1 = corners(p1).map(add), c2 = corners(p2).map(add);
+    for(let i=0; i<4; i++){ const j=(i+1)%4; quad(obj, mtl, c1[i], c1[j], c2[j], c2[i]); }
+    quad(obj, mtl, c1[3], c1[2], c1[1], c1[0]); // tapa inicial
+    quad(obj, mtl, c2[0], c2[1], c2[2], c2[3]); // tapa final
+  }
+
+  // Panel plano con espesor: pts en orden CCW visto desde afuera; se extruye hacia adentro.
+  function panel(obj, mtl, pts, t){
+    const n = norm(cross(sub(pts[1], pts[0]), sub(pts[2], pts[0]))); // normal saliente
+    const off = scl(n, -t);
+    const o1 = pts.map(add);                       // cara exterior
+    const o2 = pts.map(p => add(addv(p, off)));     // cara interior
+    face(obj, mtl, o1);
+    face(obj, mtl, o2.slice().reverse());
+    for(let i=0; i<pts.length; i++){ const j=(i+1)%pts.length; quad(obj, mtl, o1[i], o1[j], o2[j], o2[i]); }
+  }
+
+  // --- Estructura: pórticos (columnas + cabios) y correas longitudinales ---
+  g.frames.forEach(y => {
+    const n = g.nodesAt(y);
+    beam('Estructura', 'acero', n.A, n.E, S.column, S.column); // columna izq
+    beam('Estructura', 'acero', n.B, n.C, S.column, S.column); // columna der
+    beam('Estructura', 'acero', n.E, n.D, S.column, S.column); // cabio izq
+    beam('Estructura', 'acero', n.C, n.D, S.column, S.column); // cabio der
+  });
+  for(let i=0; i<g.frames.length-1; i++){
+    const a = g.nodesAt(g.frames[i]), b = g.nodesAt(g.frames[i+1]);
+    ['A','B','C','E','D'].forEach(k => beam('Estructura', 'acero', a[k], b[k], S.purlin, S.purlin));
+  }
+
+  // --- Cladding (chapa/piso con espesor), cada parte como objeto seleccionable ---
+  const f = g.nodesAt(0), r = g.nodesAt(g.depth);
+  panel('Pared_Izq',     'chapa_pared',   [f.A, f.E, r.E, r.A], S.clad); // outward -X
+  panel('Pared_Der',     'chapa_pared',   [f.B, r.B, r.C, f.C], S.clad); // outward +X
+  panel('Techo_Izq',     'chapa_techo',   [f.E, f.D, r.D, r.E], S.clad);
+  panel('Techo_Der',     'chapa_techo',   [f.C, r.C, r.D, f.D], S.clad);
+  panel('Fronton_Frente','chapa_fronton', [f.A, f.B, f.C, f.D, f.E], S.clad); // outward -Y
+  panel('Fronton_Fondo', 'chapa_fronton', [r.A, r.E, r.D, r.C, r.B], S.clad); // outward +Y
+  panel('Piso',          'hormigon',      [f.A, r.A, r.B, f.B], S.slab);       // outward -Z
+
+  // --- Serializar OBJ ---
   const out = [
     '# Galpón nórdico — exportado desde la calculadora',
     `# ancho=${g.width} m  profundidad=${g.depth} m  pared=${g.wallH.toFixed(2)} m  cumbrera=${g.ridgeH.toFixed(2)} m`,
     '# Ejes: X=ancho, Y=profundidad, Z=altura (Z-up). En Blender importar con Up=Z.',
-    'o Galpon',
+    '# Objetos separados: ocultá "Pared_*"/"Techo_*"/"Fronton_*" para ver la estructura.',
+    `mtllib ${mtlName}`,
   ];
-  verts.forEach(v => out.push(`v ${v[0].toFixed(4)} ${v[1].toFixed(4)} ${v[2].toFixed(4)}`));
-  out.push('g paredes');
-  out.push(`f ${iA} ${iE} ${jE} ${jA}`); // pared izquierda
-  out.push(`f ${iB} ${jB} ${jC} ${iC}`); // pared derecha
-  out.push('g techo');
-  out.push(`f ${iE} ${iD} ${jD} ${jE}`); // faldón izquierdo
-  out.push(`f ${iC} ${jC} ${jD} ${iD}`); // faldón derecho
-  out.push('g frontones');
-  out.push(`f ${iA} ${iB} ${iC} ${iD} ${iE}`); // frontón frente
-  out.push(`f ${jA} ${jE} ${jD} ${jC} ${jB}`); // frontón fondo
-  out.push('g piso');
-  out.push(`f ${iA} ${jA} ${jB} ${iB}`); // piso
+  V.forEach(v => out.push(`v ${v[0].toFixed(4)} ${v[1].toFixed(4)} ${v[2].toFixed(4)}`));
+
+  // Agrupar caras por objeto conservando el orden de aparición.
+  const objOrder = [];
+  const byObj = new Map();
+  faces.forEach(fc => {
+    if(!byObj.has(fc.obj)){ byObj.set(fc.obj, {mtl: fc.mtl, idx: []}); objOrder.push(fc.obj); }
+    byObj.get(fc.obj).idx.push(fc.idx);
+  });
+  objOrder.forEach(name => {
+    const grp = byObj.get(name);
+    out.push(`o ${name}`, `usemtl ${grp.mtl}`);
+    grp.idx.forEach(idx => out.push('f ' + idx.join(' ')));
+  });
+
+  return { obj: out.join('\n') + '\n', mtl: buildMtl() };
+}
+
+function buildMtl(){
+  const out = ['# Materiales del galpón — generados por la calculadora'];
+  Object.entries(OBJ_MATERIALS).forEach(([name, [r, gc, b]]) => {
+    out.push(
+      `newmtl ${name}`,
+      `Ka ${(r*0.2).toFixed(3)} ${(gc*0.2).toFixed(3)} ${(b*0.2).toFixed(3)}`,
+      `Kd ${r.toFixed(3)} ${gc.toFixed(3)} ${b.toFixed(3)}`,
+      'Ks 0.150 0.150 0.150',
+      'Ns 40',
+      'illum 2',
+      'd 1.0',
+      '',
+    );
+  });
   return out.join('\n') + '\n';
 }
 
@@ -2209,7 +2309,11 @@ document.getElementById('exportDxf').addEventListener('click', ()=>{
   triggerDownload(`galpon_${dims()}.dxf`, buildDxf(), 'application/dxf');
 });
 document.getElementById('exportObj').addEventListener('click', ()=>{
-  triggerDownload(`galpon_${dims()}.obj`, buildObj(), 'model/obj');
+  const base = `galpon_${dims()}`;
+  const mtlName = `${base}.mtl`;
+  const { obj, mtl } = buildObjMtl(mtlName);
+  triggerDownload(mtlName, mtl, 'model/mtl');
+  triggerDownload(`${base}.obj`, obj, 'model/obj');
 });
 </script>
 </body>
